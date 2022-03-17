@@ -1,0 +1,240 @@
+= CONTRIBUTING
+:author: Erdo Crypto
+:email: erdocrypto@ethmail.cc
+:revdate: 2021-12-10
+:revnumber: 0.1
+:revremark: Initial draft.
+:toc:
+:toclevels: 4
+:sectnums: 
+:doctype: book
+
+ifndef::compositing[]
+:imagesdir: ../../images/
+endif::[]
+
+ifndef::compositing[]
+:compositing:
+endif::[]
+
+= CONTRIBUTIONS
+
+All code and documentation is published under the Affero GNU Public License V3.
+The Software license can be found in the LICENSE file.
+
+The project summary and installation / build instructions are in the BUILD.adoc
+
+= Tools
+
+We recommend using VSCode for contributions.
+The content and code contribution standardizations facilitates usage of VSCode for all contributions.
+Other tools may be used, provided they produce compatible files saved in this repo.
+
+Tasks are tracked on GitHub using Issues.
+
+
+Access is reserved for internal team members.
+You will offered access if you should have access.
+
+Issues in GitHub are created using the link:https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github[GitHub Pull Requests and Issues plugin]
+
+We also recommend using the link:https://marketplace.visualstudio.com/items?itemName=ExodiusStudios.comment-anchors[Comment Anchors] plugin for VScode to easily find the todo and other task comments in the repo.
+
+***
+
+// include::docs/tools/ides/vscode/vscode.adoc[leveloffset=+1] [[debug_running_pods]]
+
+
+***
+
+// include::docs/tools/Documentation-ETHMail.adoc[leveloffset=+1]
+
+***
+
+== Download GPGSuite 
+* Use GPG Suite to encrypt, decrypt, sign and verify files or messages. Manage your GPG Keychain with a few simple clicks and experience the full power of GPG easier than ever before.
+
+** link:https://gpgtools.org/[GPGSuite for MAC] / Download Gpg4Win link:https://www.gpg4win.org/[GPG4win for Windows]
+
+***
+
+== Keybase 
+
+link:https://keybase.io/[Keybase.io], register yourself, download-install it. Finally, Validate your email. then import the GPG Key once you've generated as below.
+
+** Command line to import it : keybase pgp import -i your path of GPG.asc
+** feel free to prove more of your identity on Keybase.
+
+***
+
+include::docs/tools/security/gpg.adoc[leveloffset=+1]
+
+***
+
+== git 
+
+link:https://git-scm.com/download/win[Download GIT]
+
+** Git is software for tracking changes in any set of files, usually used for coordinating work among programmers collaboratively developing source code during software development. ** Its goals include speed, data integrity, and support for distributed, non-linear workflows.
+
+***
+
+== Yarn
+
+link:https://yarnpkg.com/[Download Yarn]
+
+** Yarn is a package manager for your code. It allows you to use and share code with other developers from around the world. Yarn does this quickly, securely, and reliably so you don't ever have to worry.
+
+***
+
+== NPM 
+
+link:https://www.npmjs.com/[Download NPM]
+
+** npm is a package manager for the JavaScript programming language maintained by npm, Inc. npm is the default package manager for the JavaScript runtime environment Node.js. It consists of a command line client, also called npm, and an online database of public and paid-for private packages, called the npm registry
+
+***
+
+== Creating an Ethereum wallet 
+
+** If you’re new to crypto and just want to get a feel for it, we recommend something that will give you the opportunity to explore Ethereum applications or buy your first ETH directly from the wallet (link:https://metamask.io/[Metamask], link:https://trustwallet.com/[TrustWallet] etc...)
+** If you’re looking to hold some serious value, we recommend a hardware wallet as these are the most secure (link:https://www.ledger.com/[ledger], link:https://trezor.io/[Trezor] etc...)
+
+***
+== ENS (Ethereum Name Service)
+
+** Registering desired user name as ENS name. This will often be done for the user, and Mimir will transfer the name to their wallet. But we should document how.
+connect to the ENS Dapps with your ETH wallet and create an ENS name (buy your ENS for few years as the gas fees are high) link:https://www.coingecko.com/buzz/coingecko-guide-to-ethereum-name-service-ens/[Everything you should know about ENS]
+
+** Registered above with the info that was just created. Users can reference my ENS cyotee.eth as a reference for what we're looking for. link:https://etherscan.io/enslookup-search?search=cyotee.eth[ENS cyotee.eth]
+
+** NOTE: Gathering all info for Mimir admin to register a Mimir ENS subdomain. If their own ENS name is configured properly, they can just provide that link as we'll just copy all that data to the sub domain we create for them 
+
+***
+
+== Create SSH key
+
+** on Windows : link:https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement[Create SSH Windows]
+
+** on MAC: link:https://docs.typo3.org/m/typo3/guide-contributionworkflow/master/en-us/Appendix/OSX/SSHKeyOSX.html[Create SSH MAC]
+
+***
+
+== Configuring git to use SSH key 
+
+** link:https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent[SSH GIT]
+
+***
+
+== Create GPG key 
+
+* for email address that will be used for commits and registered in GitHub. 
+
+* Keybase can be used for this. But users should end up with a working GPGSuite install and Keybase referencing the same key. Check the paragraph #5
+
+***
+
+== Configuring git to use new GPG key 
+
+** link:https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work[Git new GPG key] 
+** All commits must be signed with a PGP / GPG key.
+** Gitkraken - Vscode will configure this for you if you choose to use it (check the )
+** You can find instructions on how to configure git to sign your commits with a PGP key on Paragraph #5.4 - #5.5
+
+***
+
+== Uploading GPG public key to GitHub
+
+** link:https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key[Generating new GPG KEY] 
+** link:https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-new-gpg-key-to-your-github-account[Adding new GPG Key Github]
+
+***
+
+== Configuring git with user email address that is registered in GitHub 
+
+** link:https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address[Git email @ registered in Github ]
+
+***
+
+== Configuring git with user name (people can use any name they want, just pick on and set it)
+
+[source,git]
+----
+git config --global user.name "FIRST_NAME LAST_NAME"
+git config --global user.email "MY_NAME@example.com"
+----
+
+== Configuring link:https://en.gravatar.com/[Gravatar] with same email as used for GPG key and GitHub
+== Uploading GPG public key to IPFS using Pinata service
+== Uploading GPG public key to Swarm
+== Uploading GPG public key to 3Box
+== Uploading GPG key to public key server
+
+***
+
+= Documentation Contributions
+
+All projects are documented.
+Documentation is stored in the docs/ path.
+
+Documentation is written in link:https://asciidoctor.org/[AsciiDoc] format.
+AsciiDoc format uses the .adoc file extention and notation similar to Markddown.
+The file content is plain text, facilitiating versioning and reuse.
+The writer's guide can be found in the link:https://asciidoctor.org/docs/asciidoc-writers-guide/[AsciiDoctor Writer's Guide].
+And a cheatsheet is available link:http://themes.asciidoctor.org/preview/[AsciiDoctor Writer's Guide Preview] and link:https://asciidoc.org/userguide.html[AsciiDoc User Guide].
+
+This will facilitate rendering this content into websites, documentation, and promotional material.
+AsciiDoc also support embedding several plain text graphing and diagraming formats.
+
+A VSCode plugin for AsciiDoc is available link:https://marketplace.visualstudio.com/items?itemName=asciidoctor.asciidoctor-vscode[here].
+
+All workflows are diagramed.
+All software architectures are diagramed.
+Diagrams are stored in docs/diagrams
+
+Diagrams are completed using either draw.io
+
+draw.io diagrams are built using the VSCode plugin below.
+Other tools can be used, but must produce compatible files that can be savd in this repository.
+Current file standard is .drawio.svg
+https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
+
+= Code contributuons
+
+Projects are built using Hardhat with Truffle integrations as needed.
+All code will have 100% test coverage for positive and negative paths.
+The project will also have end-to-end tests simulating trading activity and volume.
+
+VSCode supports Solidity development using the following plugins:
+
+* link:https://marketplace.visualstudio.com/items?itemName=tintinweb.solidity-visual-auditor[Solidity Visual Developer]
+
+Tests will include usage of the following tools.
+
+* link:https://github.com/sc-forks/solidity-coverage[solidity-coverage]
+* link:https://github.com/crytic/slither[Slither]
+* link:https://github.com/trailofbits/manticore[Manticore]
+* link:https://github.com/ConsenSys/mythril[Mythril]
+* link:https://github.com/crytic/echidna[Echidna]
+
+Software development can be used to assit with documentation and diagraming.
+
+* link:https://github.com/pventuzelo/octopus[Octopus]
+* link:https://github.com/OpenZeppelin/solidity-docgen[solidity-docgen]
+
+Releases will include the following reports
+
+* link:https://mythx.io/[MythX]
+* link:https://tool.smartdec.net/[Smart Check]
+* link:https://contract.guardstrike.com/#/scan[Guard Strike]
+* link:https://github.com/ConsenSys/surya[Surya] (included in Solidity Visual Developer)
+* link:https://github.com/raineorshine/solgraph[solgraph]
+* link:https://github.com/blockchainsllc/piet[Piet]
+
+Some tools are still under consideration or useful for error analysis
+
+* link:https://github.com/ethereum/evmlab[EVM Tools]
+* link:https://github.com/fergarrui/ethereum-graph-debugger[Ethereum Graph Debugger]
+
+While dependencies are still under development they are included as submodules in the contracts/dependencies path.
+We recommend using link:https://www.gitkraken.com/[GitKraken] to easily manage submodules.

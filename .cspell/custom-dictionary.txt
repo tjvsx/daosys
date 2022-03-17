@@ -1,0 +1,6 @@
+# Custom Dictionary Words
+daosys
+Tokenomics
+Affero
+copyleft
+copyrightable
