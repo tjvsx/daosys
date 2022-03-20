@@ -1,6 +1,7 @@
 # Custom Dictionary Words
-daosys
-Tokenomics
 Affero
 copyleft
 copyrightable
+daosys
+GONS
+Tokenomics
