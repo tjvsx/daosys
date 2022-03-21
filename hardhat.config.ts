@@ -6,6 +6,10 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import "hardhat-tracer";
+import 'hardhat-abi-exporter';
+import 'hardhat-contract-sizer';
+import 'hardhat-spdx-license-identifier';
 
 dotenv.config();
 
@@ -23,7 +27,141 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  // solidity: {
+  //   compilers: [
+  //     { version: "0.8.4" },
+  //     { version: "0.5.12" },
+  //     { version: "0.6.12" },
+  //     { version: "0.4.18"}
+  //   ],
+  //   settings: {
+  //     optimizer: {
+  //       enabled: true,
+  //       runs: 200,
+  //     },
+  //     outputSelection: {
+  //       "*": {
+  //         "*": ["storageLayout"],
+  //       },
+  //     },
+  //   }
+  // },
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.9',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.7.5',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.6.12',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.6.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.6.0',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.5.16',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.5.12',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      },
+      {
+        version: '0.4.18',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+          outputSelection: {
+            "*": {
+              "*": ["storageLayout"],
+            },
+          },
+        }
+      }
+    ]
+  },
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
@@ -31,13 +169,30 @@ const config: HardhatUserConfig = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
+  abiExporter: {
+    clear: true,
+    flat: true,
+    except: ['.*Mock$'],
+  },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: true,
+  },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
+    // enabled: process.env.REPORT_GAS === 'true',
+    enabled: true,
+    coinmarketcap: `${process.env.COINMARKETCAP_API_KEY}`,
     currency: "USD",
   },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+  spdxLicenseIdentifier: {
+    overwrite: false,
+    runOnCompile: true,
   },
+  typechain: {
+    alwaysGenerateOverloads: true,
+    outDir: 'typechain',
+  }
 };
 
 export default config;
