@@ -1,8 +1,12 @@
 # Custom Dictionary Words
+Aavegotchi
 Affero
+antifragile
 copyleft
 copyrightable
 daosys
+DELEGATECALL
 GONS
+permissionless
 syscoin
 Tokenomics
