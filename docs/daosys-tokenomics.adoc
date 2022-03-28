@@ -18,6 +18,10 @@ ifndef::compositing[]
 :compositing:
 endif::[]
 
+== Problem Statement
+
+Current DAO tokenomics are not suited to 
+
 == Design Intent
 
 The DAOSys tokenomics is based on securing and managing interest bearing market positions to ensure long term health of the targeted market.
@@ -45,6 +49,29 @@ As users and the vault trade through these liquidity pools, the weighting change
 This weighting results in a reduced price of the TDT for the asset that users have chosen to actualize the interest due to them.
 
 == Vault Processes
+
+=== Token Generation
+
+DAOSys does not mint new tokens.
+The minting process used by most liquidity pool implementations is not suited to achieving DAOSys' goals.
+DAOSys manages it's tokens by rebasing based on user deposits.
+The process of rebasing a token that indexes the vault liquidity allows DAOSys to handle deposits more like selling a bond.
+DAOSys effectively borrows deposited assets to allocate them into markets on behalf of users to achieve an interest rate.
+That interest rate, and the interest due to other users is represented in the rebasing process and the trading activity the vault executes.
+
+Most liquidity pools behave as an impartial mediator between the provider and the market for which they are providing liquidity.
+For lending liquidity pools, the lending platform is simply mediating the collateralization and debt process between lenders and debtors.
+For exchange liquidity pools, the DEX is simply mediating the order book between liquidity providers and traders.
+DAOSys fulfills it's design ethos of DAOs acting as algorithmic agents by acting as the borrower of last resort for lenders.
+
+DAOSys generates new tokens to reflect an inflow of capital by rebasing it's tokens.
+This rebase allows these tokens to index the state of the treasury.
+This is done by tracking the deposit and borrowing of assets after pricing them in the native coin of the host blockchain.
+This is accomplished by using two tokens that index different portions of the treasury.
+
+The Treasury Token (TT) indexes the capital that has been deposited in the vault.
+Each pool tracks it's contribution 
+
 
 image::images/finance/daosys-finance-01-strategies-00-overview.drawio.svg[align=center]
 

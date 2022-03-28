@@ -1,4 +1,4 @@
-= DAOSys Architecture
+= Autonomous Service Engine Architecture
 :author: cyotee doge
 :email: cyotee@syscoin.org
 :revdate: 2022-02-19
@@ -17,3 +17,5 @@ endif::[]
 ifndef::compositing[]
 :compositing:
 endif::[]
+
+The Autonomous Service Engine (ASE) 
