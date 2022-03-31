@@ -153,3 +153,44 @@ function transfer(address to, uint256 value) external override validRecipient(to
 In this sample, the emit operation is not relevant to processing the transfer.
 For both functions, the `_gonsPerFragment` is used as the price for calculating the exchange rate to GONS.
 In the case of the `transfer(address,uint245)` function, this exchange rate is used to change the GONS balance for the two parties of the transfer.
+
+== Rebasing Capable Constant Produce Trading
+
+Constant Product Trading is the foundation of decentralized finance.
+The majority of decentralized exchanges either use Constant Product Trading, or a modification of the same formula.
+Constant Product Trading is a simple formula, stem:[x*y=K].
+stem:[K] must remain invariant during a trade.
+So the exchange rate is calculated as the amount of stem:[y] that must be exchanged for a user provided value of stem:[x] to keep stem:[K] invariant.
+Most implementations rely on storing the values for stem:[x] and stem:[y] to calculate stem:[K] for use as the invariant in later transactions.
+The typical workflow is as an optimistic operation.
+The DEX liquidity pool typically expects to receive the amount of stem:[x] the users wishes to pay _before_ the transaction executing the trade is received.
+To ensure the trade is completed within a price range the user accepts, the liquidity pool expects to receive an argument defining the minimum the amount the user expects to receive.
+This is why Uniswap and similar implementations use a Router to facilitate user transactions.
+In addition to the Router being able to process trades across several pairs to allow users to trade between assets, it also ensures that the payment is send, and the trade is executed in the same transaction.
+
+This makes defining the formula the represents the exact trad process a little more complicated then the abstract form.
+We will define this in the scope of a single event of trading through the router.
+We will define the variables as follows.
+
+The value of stem:[x] prior to trading event will be stem:[x_(t-1)].
+
+The value of stem:[y] prior to the trading event will be stem:[y_(t-1)].
+
+This value of stem:[K] prior to the trading event will be stem:[K_(t-1)].
+
+The amount of stem:[x] the user is paying as the trading event in exchange for stem:[y] will be stem:[x_t].
+
+The amount of stem:[y] due to the user to complete the trade will be stem:[y_t].
+
+Beginning with the abstract Constant Product Trading formula denoting the relative event timing we get the formula transformation below.
+
+[stem]
+++++
+x_(t-1) * y_(t-1) = K_(t-1)
+
+(x_(t-1) + x_(t)) * (y_(t-1) + y_(t) = K_(t-1)
+
+y_(t-1) + y_(t) = frac{K_(t-1)}{(x_(t-1) + x_(t))}
+
+y_(t) = frac{K_(t-1)}{(x_(t-1) + x_(t))} - y_(t-1)
+++++
