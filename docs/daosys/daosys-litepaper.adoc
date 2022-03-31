@@ -41,7 +41,6 @@ Tantamount to not controlling the keys to your own wallet.
 And current governance solutions are not suited to respecting stakeholder value.
 This is further compounded with the typical disconnect between DAOs governance token and the protocol's actual value proposition.
 
-
 == Introduction
 
 DAOSYS aims to resolve the DAO mission statement to governance gap with a revolutionary model for coordinating cryptocurrency as capital investments.
@@ -57,7 +56,6 @@ But, by iterating on the AMM model to generalize the process it's possible to de
 By applying antifragile tokenomics and integrations with defi protocols a treasury management platform can be realized without the need for a governance token.
 This way, DAOs can leverage existing markets as the foundation for coordinating capital to execute their mission statement.
 This technology is provided in the technology behind DAOSYS, the Autonomous Service Engine.
-
 
 DAOSYS will consist of a reference architecture using the Autonomous Service Engine.
 This will make Syscoin a hotbed of innovation through the self-sovereign asset management.
