@@ -31,5 +31,10 @@ class TokenAddress():
     def delta_balance(self, delta, user_address):
         gon_delta = delta/self.__gons_per_frag
         
-        self.__gon_balances[user_address] = self.__gon_balances[user_address] + gon_delta  
+        new_balance = self.__gon_balances[user_address] + gon_delta 
+        
+        if(new_balance >= 0): 
+            self.__gon_balances[user_address] = new_balance
+        else:
+            print('Error, negative balance')
      

@@ -45,7 +45,11 @@ class Token():
         else:    
             self.__addresses.delta_balance(delta, address)
  
-        self.__supply.rebase(delta)     
+        self.__supply.rebase(delta) 
     
+    def transfer(self, delta, from_address, to_address):
+        self.__addresses.delta_balance(-delta, from_address)
+        self.__addresses.delta_balance(delta, to_address)
+     
     def rebase(self, delta):
         self.__supply.rebase(delta)  
