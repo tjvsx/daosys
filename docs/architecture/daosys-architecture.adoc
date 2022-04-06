@@ -91,6 +91,27 @@ This process of setting the storage slot for a storage variable of a custom Stru
 As in, "The struct that stores the user's balances is bound to slot index 0".
 The ASE defines a design standard for implementing all datatypes as structs so that they may be dynamically bound to storage slots.
 
+=== Transaction Router Design Pattern
+
+The Transaction Router design pattern is used when simple function selector based logic delegation does not fully serve a use case.
+A Transaction Router infers the desired operation from the transaction context.
+In this case, the transaction context is the implicit variables and explicit arguments sent by the user to execute a transaction.
+The logic inference is typically domain specific.
+
+An example of a Transaction Router can be defined based on ERC-20.
+In this example, the ERC-20 token is a liquidity pool (LP) token.
+The LP token takes deposits from users, and mints a balance to the user to represent their deposit.
+
+Typically LP tokens will expose a domain specific interface to handle deposits.
+This may be needed in some domains.
+But in many domains, it is possible to infer the desire to deposit and withdraw from the transaction context.
+For example, if a user issues a transaction that defines transferring some of the LP tokens from the token contract to themselves, we can infer that the user wishes to make a deposit.
+
+A user would do this by calling the `transferFrom(address holder, address recipient, uint256 amount)` function.
+They would provide the token address as the `holder` parameter and themselves as the `recipient` parameter.
+The LP can reasonably infer that because the user does not have the authority to transfer any of the token's balance of itself, obviously they wish to make a deposit.
+Thus, the LP token would use a Transaction Router Delegate Service to determine which Delegate Service to use to process the transaction.
+
 == Design Standards
 
 === Deterministically Dynamic Storage Allocation
@@ -248,25 +269,27 @@ Under the ASE framework, the customized Diamond proxies are termed Service Proxi
 The Facets defined in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535] are termed Services.
 
 The distinction is in two factors.
-Service Proxies are immutable.
+Delegate Service Proxies are immutable.
 The functions defined in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535] to reconfigure a proxy to use new facets is not available by default in a Service Proxy.
 This is done because there is not acceptable solution to the risk updates present to users of the proxy.
 A Service Proxy may be configured with a Service that exposes a https://eips.ethereum.org/EIPS/eip-2535[ERC-2535] compliant interface for private instances.
 The ASE will only deploy reconfiguration Services for a Service Proxy that includes an explicit ACL Service.
 
 Second, Service Proxies are wrapped in a Minimal Proxy as defined in https://eips.ethereum.org/EIPS/eip-1167[ERC-1167].
-The Service Proxy logic is itself a Service.
+The Service Proxy logic is itself a Delegate Service.
 The Service Proxy Factory uses https://eips.ethereum.org/EIPS/eip-1167[ERC-1167] to deploy a Minimal Proxy that directs to the Service Proxy logic.
 This minimizes the transaction fee for deploying new proxies with a minimal increase in per-transaction fees for use.
 This also allows easier verification that a new Service Proxy is reusing proven code.
 Finally, for particularly sensitive Services, a circuit breaker can be included to protect all Service Proxies consuming that service.
 For this reason, Services will implemented to be as minimal as possible.
-With emergency withdrawal or liquidation services graceful degradation for if a service is disabled.
+With emergency withdrawal or liquidation services to gracefully degrade if a service is disabled.
 
-=== Services
+image::images/architecture/daosys-architecture-01-ase-02-architecture.drawio.svg[align=center]
 
-Services replace the Facets defined in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535].
-Services define a strict storage allocation and access standard beyond the theory presented in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535].
+=== Delegate Services
+
+Delegate Services replace the Facets defined in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535].
+Delegate Services define a strict storage allocation and access standard beyond the theory presented in https://eips.ethereum.org/EIPS/eip-2535[ERC-2535].
 A Service is a smart-contract or library implemented following the Deterministically Dynamic Storage Allocation standard.
 A Service also reports the factory that deployed that contract and the salt used during deployment.
 This way the recalculation of the address from the factory init code hash and salt can be used to verify new Services as an implicit ACL.
@@ -325,3 +348,12 @@ The Service Proxy is a special Service that is the target of the Minimal Proxies
 It is published in the Service Registry under the invalid interface ID as defined in https://eips.ethereum.org/EIPS/eip-165[ERC-165].
 This allows for later factory instances to override the original Service Proxy implementation is desired.
 Because of this reserved interface ID, there is no need to declare the Service Proxy in a new Service Proxy configuration.
+
+The Service Proxy implements a `fallback() payable` function.
+This `fallback() payable` function uses the implicit variable `msg.sig` to lookup which address to use as the target of a `DELEGATECALL`.
+This is the Delegate Service configured when the Service Proxy was deployed from the factory.
+The transaction data is forwarded to the target Delegate Service.
+The target Delegate Service then executes it's implemented logic using the storage of the Service Proxy that issued the `DELEGATECALL`.
+
+A Service Proxy may need more complex transaction processing that is domain specific.
+This is defined in the Transaction Router design pattern.

@@ -8,14 +8,6 @@ library Bytes4ToAddress {
     mapping(bytes4 => address) value;
   }
 
-  /*
-  NOTE Implemented here as the binding of the Layout struct is tightly coupled
-    to the binding of a storage slot.
-   */
-  function _layout( bytes32 slot ) pure internal returns ( Bytes4ToAddress.Layout storage layout ) {
-    assembly{ layout.slot := slot }
-  }
-
 }
 
 library Bytes4ToAddressUtils {
@@ -26,8 +18,17 @@ library Bytes4ToAddressUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( Bytes4ToAddress.Layout storage layout ) {
-    layout = Bytes4ToAddress._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( Bytes4ToAddress.Layout storage layout ) {
+    bytes32 saltedSlot =
+      salt
+      ^ Bytes4ToAddressUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
 }

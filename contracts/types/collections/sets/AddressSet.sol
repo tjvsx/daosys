@@ -14,15 +14,7 @@ library AddressSet {
   }
 
   struct Layout {
-    Enumerable addressSet;
-  }
-
-  /*
-  NOTE Implemented here as the binding of the Layout struct is tightly coupled
-    to the binding of a storage slot.
-   */
-  function _layout( bytes32 slot ) pure internal returns ( AddressSet.Layout storage layout ) {
-    assembly{ layout.slot := slot }
+    AddressSet.Enumerable addressSet;
   }
 
 }
@@ -40,8 +32,17 @@ library AddressSetUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( AddressSet.Layout storage layout ) {
-    layout = AddressSet._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( AddressSet.Layout storage layout ) {
+    bytes32 saltedSlot =
+      salt
+      ^ AddressSetUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _at(

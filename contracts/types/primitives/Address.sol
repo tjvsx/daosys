@@ -11,14 +11,6 @@ library Address {
   struct Layout {
     address value;
   }
-
-  /*
-  NOTE Implemented here as the binding of the Layout struct is tightly coupled
-    to the binding of a storage slot.
-   */
-  function _layout( bytes32 slot ) pure internal returns ( Address.Layout storage layout ) {
-    assembly{ layout.slot := slot }
-  }
   
 }
 
@@ -38,8 +30,16 @@ library AddressUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( Address.Layout storage layout ) {
-    layout = Address._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( Address.Layout storage layout ) {
+    bytes32 saltedSlot = salt
+      ^ AddressUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _toString(address account) internal pure returns (string memory) {
