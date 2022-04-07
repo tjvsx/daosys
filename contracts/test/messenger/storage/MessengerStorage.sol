@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-
 import {
   String,
   StringUtils
@@ -15,13 +13,8 @@ library MessengerStorage {
     String.Layout message;
   }
 
-  function _layout(bytes32 salt) view internal returns (MessengerStorage.Layout storage layout) {
-    console.log("MessengerStorage:_layout:: String Struct storage slot: ", address(bytes20(StringUtils._structSlot())));
-
-    console.log("MessengerStorage:_layout:: Salting storage slot with: ", address(bytes20(salt)));
+  function _layout(bytes32 salt) pure internal returns (MessengerStorage.Layout storage layout) {
     bytes32 saltedSlot = salt ^ StringUtils._structSlot();
-    
-    console.log("MessengerStorage:_layout:: Using storage slot: ", address(bytes20(saltedSlot)));
     assembly{ layout.slot := saltedSlot }
   }
   
