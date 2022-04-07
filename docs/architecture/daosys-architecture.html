@@ -456,11 +456,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_factory_design_pattern">2.1. Factory Design Pattern</a></li>
 <li><a href="#_proxy_design_pattern">2.2. Proxy Design Pattern</a></li>
 <li><a href="#_diamond_design_pattern">2.3. Diamond Design Pattern</a></li>
+<li><a href="#_transaction_router_design_pattern">2.4. Transaction Router Design Pattern</a></li>
 </ul>
 </li>
 <li><a href="#_design_standards">3. Design Standards</a>
 <ul class="sectlevel2">
 <li><a href="#_deterministically_dynamic_storage_allocation">3.1. Deterministically Dynamic Storage Allocation</a></li>
+</ul>
+</li>
+<li><a href="#_architecture">4. Architecture</a>
+<ul class="sectlevel2">
+<li><a href="#_delegate_services">4.1. Delegate Services</a></li>
+<li><a href="#_service_registry">4.2. Service Registry</a></li>
+<li><a href="#_service_proxy">4.3. Service Proxy</a></li>
 </ul>
 </li>
 </ul>
@@ -473,7 +481,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph data-line-23">
 <p>The Autonomous Service Engine (ASE) is a proxy factory.
 The architecture merges the Diamond Proxy and Factory design patterns.
-User may have the factory deploy a proxy configured with the functionality they wish.
+Users may have the factory deploy a proxy configured with the functionality they wish.
 This allows users to compose a variety of functionality in a single proxy.</p>
 </div>
 </div>
@@ -557,19 +565,45 @@ As in, "The struct that stores the user&#8217;s balances is bound to slot index 
 The ASE defines a design standard for implementing all datatypes as structs so that they may be dynamically bound to storage slots.</p>
 </div>
 </div>
+<div class="sect2 data-line-94">
+<h3 id="_transaction_router_design_pattern">2.4. Transaction Router Design Pattern</h3>
+<div class="paragraph data-line-96">
+<p>The Transaction Router design pattern is used when simple function selector based logic delegation does not fully serve a use case.
+A Transaction Router infers the desired operation from the transaction context.
+In this case, the transaction context is the implicit variables and explicit arguments sent by the user to execute a transaction.
+The logic inference is typically domain specific.</p>
+</div>
+<div class="paragraph data-line-101">
+<p>An example of a Transaction Router can be defined based on ERC-20.
+In this example, the ERC-20 token is a liquidity pool (LP) token.
+The LP token takes deposits from users, and mints a balance to the user to represent their deposit.</p>
+</div>
+<div class="paragraph data-line-105">
+<p>Typically LP tokens will expose a domain specific interface to handle deposits.
+This may be needed in some domains.
+But in many domains, it is possible to infer the desire to deposit and withdraw from the transaction context.
+For example, if a user issues a transaction that defines transferring some of the LP tokens from the token contract to themselves, we can infer that the user wishes to make a deposit.</p>
+</div>
+<div class="paragraph data-line-110">
+<p>A user would do this by calling the <code>transferFrom(address holder, address recipient, uint256 amount)</code> function.
+They would provide the token address as the <code>holder</code> parameter and themselves as the <code>recipient</code> parameter.
+The LP can reasonably infer that because the user does not have the authority to transfer any of the token&#8217;s balance of itself, obviously they wish to make a deposit.
+Thus, the LP token would use a Transaction Router Delegate Service to determine which Delegate Service to use to process the transaction.</p>
 </div>
 </div>
-<div class="sect1 data-line-94">
+</div>
+</div>
+<div class="sect1 data-line-115">
 <h2 id="_design_standards">3. Design Standards</h2>
 <div class="sectionbody">
-<div class="sect2 data-line-96">
+<div class="sect2 data-line-117">
 <h3 id="_deterministically_dynamic_storage_allocation">3.1. Deterministically Dynamic Storage Allocation</h3>
-<div class="paragraph data-line-98">
+<div class="paragraph data-line-119">
 <p>Deterministically Dynamic Storage Allocation (DDSA) takes advantage of built-in hashing functionality of the EVM.
 By enforcing the implementation of all datatypes as libraries defining custom structs, a consistent bytecode for that datatype is defined.
 And example can be seen the following code sample.</p>
 </div>
-<div class="listingblock data-line-103">
+<div class="listingblock data-line-124">
 <div class="content">
 <pre class="highlight"><code class="language-solidity" data-lang="solidity">library String {
 
@@ -584,17 +618,17 @@ And example can be seen the following code sample.</p>
 }</code></pre>
 </div>
 </div>
-<div class="paragraph data-line-117">
+<div class="paragraph data-line-138">
 <p>The datatype libraries for the ASE are implemented as a struct containing just the desired primitive datatype.
 Each datatype library also implements the a standard function used to bind a storage pointer to an instance of the struct.
 The name of the library must be the same as, or directly descriptive of, the primitive datatype.
 This provides a standardized implementation that results in consistent bytecode.</p>
 </div>
-<div class="paragraph data-line-122">
+<div class="paragraph data-line-143">
 <p>A utility library is implemented to facilitate use of the datatype library.
 An example can be seen here.</p>
 </div>
-<div class="listingblock data-line-126">
+<div class="listingblock data-line-147">
 <div class="content">
 <pre class="highlight"><code class="language-solidity" data-lang="solidity">library StringUtils {
 
@@ -611,7 +645,7 @@ An example can be seen here.</p>
 }</code></pre>
 </div>
 </div>
-<div class="paragraph data-line-142">
+<div class="paragraph data-line-163">
 <p>A constant is calculated by hashing the bytecode of the library defining the datatype struct.
 This is made available with the standard <code>_structSlot()</code> function.
 The standardization of the struct library implementations, and the hashing of that bytecode ensures that the correct struct is being used to access storage.
@@ -619,24 +653,24 @@ A reimplementation of the <code>_layout(bytes32)</code> function is also provide
 This way code that includes this library does not have to tightly couple their implementations for the underlying datatype library.
 While Solidity does not have full polymorphism, this process allows us to leverage the pseudo-polymorphism that&#8217;s available.</p>
 </div>
-<div class="paragraph data-line-149">
+<div class="paragraph data-line-170">
 <p>The usage of bytecode hashes as storage slots is the foundation of the storage standard used in the ASE.
 From here, a modification of the Diamond Storage design pattern is applied.</p>
 </div>
-<div class="paragraph data-line-152">
+<div class="paragraph data-line-173">
 <p>In th Diamond Storage design pattern, the state variables for a particular implementation is composed into one or more structs.
 The storage slot is also defined using a hash of some value.
 The design pattern has no opinion on the values to hash.
 While this is appropriate for a design pattern, the ASE framework asserts an opinion.</p>
 </div>
-<div class="paragraph data-line-157">
+<div class="paragraph data-line-178">
 <p>One of the common problems with applying Diamond Storage is the complexities around using dynamic length datatypes.
 While storage slot packing can be used, this also introduces a potential conflict.
 An update to a facet applying Diamond Storage may introduce an incompatibility with how the storage has been managed until the update is applied.
 The ASE applies Diamond Storage to the base datatype library usage.
 And example can be seen below.</p>
 </div>
-<div class="listingblock data-line-164">
+<div class="listingblock data-line-185">
 <div class="content">
 <pre class="highlight"><code class="language-solidity" data-lang="solidity">library MessengerStorage {
 
@@ -652,7 +686,7 @@ And example can be seen below.</p>
 }</code></pre>
 </div>
 </div>
-<div class="paragraph data-line-179">
+<div class="paragraph data-line-200">
 <p>This process of wrapping the datatype libraries in a domain specific struct it forces dynamic length dataypes into storage pointers.
 Further, the standard <code>_layout(bytes32)</code> function combines the default storage slot for each of the composed datatypes.
 This helps ensure that the structure for a set of state variables is consistently stored based on that structure.
@@ -660,13 +694,13 @@ This way, in the event of a failure to implement the libraries to access the sto
 This helps protect existing data.
 A parameter is available to provide a salt to group usage of a struct by the exposed smart-contract interface.</p>
 </div>
-<div class="paragraph data-line-186">
+<div class="paragraph data-line-207">
 <p>So far this has covered how storage is managed internally.
 But state variables exists in service of implementing an interface.
 This why the usage of datatype structs with Diamond Storage within the ASE is bound to the interfaces exposed by particular facets.
 And example of this can be seen below.</p>
 </div>
-<div class="listingblock data-line-192">
+<div class="listingblock data-line-213">
 <div class="content">
 <pre class="highlight"><code class="language-solidity" data-lang="solidity">abstract contract MessengerInternal {
 
@@ -687,19 +721,19 @@ And example of this can be seen below.</p>
 }</code></pre>
 </div>
 </div>
-<div class="paragraph data-line-212">
+<div class="paragraph data-line-233">
 <p>This example is of an abstract contract that implements the desired domain logic.
 The domain logic uses the interface ID this is to serve as the salt for the storage slot calculation.
 This allows for two main features.</p>
 </div>
-<div class="paragraph data-line-216">
+<div class="paragraph data-line-237">
 <p>First, the usage is a Diamond Storage struct can be grouped by the interface ID that struct supports.
 This allows for safely reusing Diamond Storage structs in other facets to support other interfaces.
 Because the Diamond Storage struct is using a deterministic storage slot computed from its structure, it can be reliably allocated to a range of storage slots.
 And the complex datatypes that consume a dynamic amount of storage are deterministically distributed to other storage slots based on the base storage slot.
 This greatly minimizes the chance of storage slot collisions across facets, while promoting code reuse.</p>
 </div>
-<div class="paragraph data-line-222">
+<div class="paragraph data-line-243">
 <p>Second, this allows for facets to reliably interact with storage across interfaces by having a reliable process for calculating the storage slots used in service of that interface.
 This way the functionality and flexibility of a proxy is greatly enhanced due to the consistent storage allocations.
 And remains consistently safe.
@@ -708,12 +742,12 @@ This is akin to the solution for the Infinite Hotel Paradox.
 By including the set of possible values in the distribution formula for that set of values, you get an ever expanding variance in the distribution.
 A simple diagram explaining this is below.</p>
 </div>
-<div class="imageblock text-center data-line-230">
+<div class="imageblock text-center data-line-251">
 <div class="content">
 <img src="data:image/svg+xml;base64,PHN2ZyBob3N0PSI2NWJkNzExNDRlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0NThweCIgaGVpZ2h0PSIzNjNweCIgdmlld0JveD0iLTAuNSAtMC41IDQ1OCAzNjMiIGNvbnRlbnQ9IiZsdDtteGZpbGUmZ3Q7Jmx0O2RpYWdyYW0gaWQ9JnF1b3Q7TWZNOW1pTmVRNXZDQlAxYlR2Rm0mcXVvdDsgbmFtZT0mcXVvdDtQYWdlLTEmcXVvdDsmZ3Q7N1ZqSmNxTXdFUDBhcmxNSVlXSWZ4MHNtT2N4UzQ4TmtqZ3EwUVJXQktDRXZ6TmVQQkdJenRwTlVNT1ZEdUZoNjNTMkpmcTFuQ1FzdjRzTTNRZExvT3crQVdZNGRIQ3k4dEJ3SDJkT0ordEZJWGlKMzJDbUJVTkRBT0RYQW12NkRLdEtnV3hwQTFuR1VuRE5KMHk3bzh5UUJYM1l3SWdUZmQ5MDJuSFZuVFVrSVBXRHRFOVpILzlCQVJpVTZuZGdOL2dBMGpLcVprVzBzejhSL0NRWGZKbVkreThHYjRpbk5NYW5HTXY1WlJBSytiMEY0WmVHRjRGeVdyZml3QUtaelc2V3RqTHMvWTYzWExTQ1Jid2t3UE8wSTIwSzFZbytwMEhtV2trUzFROTFlRWtsa25vTHlYRXV4VlFsMzdDVnN5SmJKQXVKQzUxTzFHTmZBajNvUU5YRjdIUFBPTXEveVhHUUs5RnBzWmQ1SFZNSTZKYjYyN2xWbEtTeVNNVk05cEpvYnl0aUNNeTZLV0R5YjNhdEhyMVFLL2dJdGkxMDhPb0luOGhSZVJsVE00bnBsT3hBU0RtZFRpV3FDVk9FRGowR0tYTG1ZQU1jMW5KcWFkNnFhMkRjVlZHTlJxM3FxT0dLS05xeUhib2hURGNQZEdlSW52ZHhDb0VyYWRMbVFFUTk1UXRpcVFlZXErRkp0TmJ0SXAybmVaYVNWZlpVRmtUOFp2T2o4MVowdms2cTdQTFNOeTl6MEdIa0dOcSszUlVWSFlNcW5KT21leEpUcGlBZGdPNURVSjhaZ3BBR2hDMnhDRW56VmUxNi9DU05aUnYyTFJYR09mSjJ2eTlTcjlQS3Q4STJYVVRSSlJBakd5enRkSUFJWWtYVFhIZjBVMjBXb2VoZVN0eHhTVGhPWnRVYitwWUZXM1hYTHpqdmE4SmU5ai9SQk5jcnBtNktyMytOTmRlajA5T1M5Mm9GNmhmd1JrZEFTTVp2ZGprZ2NhWVRibHdqM2FoSnhONXBFb0UrSktDRGNsd2gwcGo2dXF4R3VkN1R0WDFHSlkzL3NEaXNUdUM4VGxNUmNuWm82a2xEclJhTWhQNnpKNmtuOVB2MzhmVUkrQmo1ZURLWWNvU0FCaGNZNzRRbGNSVkRHVlJUdlUxRkdWaFMzcnlpVFd4QVU1TDVQVUlZK2Q3Z2ZQbmM0ZzZ2SExWMU9qbVFDT1NQS2hOZmpab2c3Smhyampubmp4OGRScjVoM1BSb2ZFd2xpbzFQcDJQUGltNGVpaDh0ci9TTnJLbTU0VDJGdnhEMDF2VWpHNDFJemtrdkkzTUVadU9IdGdFK28ydlJhWngvMGVZUWQ2QWlMbk5kcHJMRVA4cWk2emNmVjhwelJmTUhHcS84PSZsdDsvZGlhZ3JhbSZndDsmbHQ7L214ZmlsZSZndDsiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij4KICAgIDxkZWZzLz4KICAgIDxnPgogICAgICAgIDxyZWN0IHg9IjIyOCIgeT0iMTYxIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjOTlmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIgcG9pbnRlci1ldmVudHM9ImFsbCIvPgogICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjUgLTAuNSkiPgogICAgICAgICAgICA8c3dpdGNoPgogICAgICAgICAgICAgICAgPGZvcmVpZ25PYmplY3QgcG9pbnRlci1ldmVudHM9Im5vbmUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHJlcXVpcmVkRmVhdHVyZXM9Imh0dHA6Ly93d3cudzMub3JnL1RSL1NWRzExL2ZlYXR1cmUjRXh0ZW5zaWJpbGl0eSIgc3R5bGU9Im92ZXJmbG93OiB2aXNpYmxlOyB0ZXh0LWFsaWduOiBsZWZ0OyI+CiAgICAgICAgICAgICAgICAgICAgPGRpdiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgc3R5bGU9ImRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiB1bnNhZmUgY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IHVuc2FmZSBjZW50ZXI7IHdpZHRoOiAxOThweDsgaGVpZ2h0OiAxcHg7IHBhZGRpbmctdG9wOiAxODFweDsgbWFyZ2luLWxlZnQ6IDIyOXB4OyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgZGF0YS1kcmF3aW8tY29sb3JzPSJjb2xvcjogIzAwMDAwMDsgIiBzdHlsZT0iYm94LXNpemluZzogYm9yZGVyLWJveDsgZm9udC1zaXplOiAwcHg7IHRleHQtYWxpZ246IGNlbnRlcjsiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBzdHlsZT0iZGlzcGxheTogaW5saW5lLWJsb2NrOyBmb250LXNpemU6IDEycHg7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7IGNvbG9yOiByZ2IoMCwgMCwgMCk7IGxpbmUtaGVpZ2h0OiAxLjI7IHBvaW50ZXItZXZlbnRzOiBhbGw7IHdoaXRlLXNwYWNlOiBub3JtYWw7IG92ZXJmbG93LXdyYXA6IG5vcm1hbDsiPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEYXRhdHlwZSBTdHJ1Y3QgRGVmYXVsdCBTdG9yYWdlIFNsb3QgTjIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2ZvcmVpZ25PYmplY3Q+CiAgICAgICAgICAgICAgICA8dGV4dCB4PSIzMjgiIHk9IjE4NSIgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSIgZm9udC1zaXplPSIxMnB4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgICAgICAgICAgICAgICAgICBEYXRhdHlwZSBTdHJ1Y3QgRGVmYXVsdCBTdG9yYWdlIFMuLi4KICAgICAgICAgICAgICAgIDwvdGV4dD4KICAgICAgICAgICAgPC9zd2l0Y2g+CiAgICAgICAgPC9nPgogICAgICAgIDxwYXRoIGQ9Ik0gMjggMjEgTCA4IDIxIEwgOCAxODEgTCAxNy45IDE4MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgcG9pbnRlci1ldmVudHM9InN0cm9rZSIvPgogICAgICAgIDxwYXRoIGQ9Ik0gMjQuNjUgMTgxIEwgMTUuNjUgMTg1LjUgTCAxNy45IDE4MSBMIDE1LjY1IDE3Ni41IFoiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHBvaW50ZXItZXZlbnRzPSJhbGwiLz4KICAgICAgICA8cmVjdCB4PSIyOCIgeT0iMSIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MCIgZmlsbD0iI2ZmZmY5OSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjMiIHBvaW50ZXItZXZlbnRzPSJhbGwiLz4KICAgICAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMC41IC0wLjUpIj4KICAgICAgICAgICAgPHN3aXRjaD4KICAgICAgICAgICAgICAgIDxmb3JlaWduT2JqZWN0IHBvaW50ZXItZXZlbnRzPSJub25lIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiByZXF1aXJlZEZlYXR1cmVzPSJodHRwOi8vd3d3LnczLm9yZy9UUi9TVkcxMS9mZWF0dXJlI0V4dGVuc2liaWxpdHkiIHN0eWxlPSJvdmVyZmxvdzogdmlzaWJsZTsgdGV4dC1hbGlnbjogbGVmdDsiPgogICAgICAgICAgICAgICAgICAgIDxkaXYgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGh0bWwiIHN0eWxlPSJkaXNwbGF5OiBmbGV4OyBhbGlnbi1pdGVtczogdW5zYWZlIGNlbnRlcjsganVzdGlmeS1jb250ZW50OiB1bnNhZmUgY2VudGVyOyB3aWR0aDogMzk4cHg7IGhlaWdodDogMXB4OyBwYWRkaW5nLXRvcDogMjFweDsgbWFyZ2luLWxlZnQ6IDI5cHg7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBkYXRhLWRyYXdpby1jb2xvcnM9ImNvbG9yOiAjMDAwMDAwOyAiIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LXNpemU6IDBweDsgdGV4dC1hbGlnbjogY2VudGVyOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OiBpbmxpbmUtYmxvY2s7IGZvbnQtc2l6ZTogMTJweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsgY29sb3I6IHJnYigwLCAwLCAwKTsgbGluZS1oZWlnaHQ6IDEuMjsgcG9pbnRlci1ldmVudHM6IGFsbDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgb3ZlcmZsb3ctd3JhcDogbm9ybWFsOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRGF0YXR5cGUgU3RydWN0IERlZmF1bHQgU3RvcmFnZSBTbG90IE4xCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2ZvcmVpZ25PYmplY3Q+CiAgICAgICAgICAgICAgICA8dGV4dCB4PSIyMjgiIHk9IjI1IiBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0iSGVsdmV0aWNhIiBmb250LXNpemU9IjEycHgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPgogICAgICAgICAgICAgICAgICAgIERhdGF0eXBlIFN0cnVjdCBEZWZhdWx0IFN0b3JhZ2UgU2xvdCBOMQogICAgICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8L3N3aXRjaD4KICAgICAgICA8L2c+CiAgICAgICAgPHBhdGggZD0iTSA0MjggMjIxIEwgNDQ4IDIyMSBMIDQ0OCAzMDEgTCA0MzguMSAzMDEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHBvaW50ZXItZXZlbnRzPSJzdHJva2UiLz4KICAgICAgICA8cGF0aCBkPSJNIDQzMS4zNSAzMDEgTCA0NDAuMzUgMjk2LjUgTCA0MzguMSAzMDEgTCA0NDAuMzUgMzA1LjUgWiIgZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgcG9pbnRlci1ldmVudHM9ImFsbCIvPgogICAgICAgIDxyZWN0IHg9IjI4IiB5PSIyMDEiIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAiIGZpbGw9IiM5OWZmOTkiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuNSAtMC41KSI+CiAgICAgICAgICAgIDxzd2l0Y2g+CiAgICAgICAgICAgICAgICA8Zm9yZWlnbk9iamVjdCBwb2ludGVyLWV2ZW50cz0ibm9uZSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgcmVxdWlyZWRGZWF0dXJlcz0iaHR0cDovL3d3dy53My5vcmcvVFIvU1ZHMTEvZmVhdHVyZSNFeHRlbnNpYmlsaXR5IiBzdHlsZT0ib3ZlcmZsb3c6IHZpc2libGU7IHRleHQtYWxpZ246IGxlZnQ7Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hodG1sIiBzdHlsZT0iZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IHVuc2FmZSBjZW50ZXI7IGp1c3RpZnktY29udGVudDogdW5zYWZlIGNlbnRlcjsgd2lkdGg6IDM5OHB4OyBoZWlnaHQ6IDFweDsgcGFkZGluZy10b3A6IDIyMXB4OyBtYXJnaW4tbGVmdDogMjlweDsiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGRhdGEtZHJhd2lvLWNvbG9ycz0iY29sb3I6ICMwMDAwMDA7ICIgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IGZvbnQtc2l6ZTogMHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6IGlubGluZS1ibG9jazsgZm9udC1zaXplOiAxMnB4OyBmb250LWZhbWlseTogSGVsdmV0aWNhOyBjb2xvcjogcmdiKDAsIDAsIDApOyBsaW5lLWhlaWdodDogMS4yOyBwb2ludGVyLWV2ZW50czogYWxsOyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBvdmVyZmxvdy13cmFwOiBub3JtYWw7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEaWFtb25kIFN0b3JhZ2UgU3RydWN0IERhdGF0eXBlIE5eWCBYT1IgU3RvcmFnZSBTbG90CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2ZvcmVpZ25PYmplY3Q+CiAgICAgICAgICAgICAgICA8dGV4dCB4PSIyMjgiIHk9IjIyNSIgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSIgZm9udC1zaXplPSIxMnB4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgICAgICAgICAgICAgICAgICBEaWFtb25kIFN0b3JhZ2UgU3RydWN0IERhdGF0eXBlIE5eWCBYT1IgU3RvcmFnZSBTbG90CiAgICAgICAgICAgICAgICA8L3RleHQ+CiAgICAgICAgICAgIDwvc3dpdGNoPgogICAgICAgIDwvZz4KICAgICAgICA8cGF0aCBkPSJNIDQyOCAxMDEgTCA0NDggMTAxIEwgNDQ4IDE4MSBMIDQzOC4xIDE4MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgcG9pbnRlci1ldmVudHM9InN0cm9rZSIvPgogICAgICAgIDxwYXRoIGQ9Ik0gNDMxLjM1IDE4MSBMIDQ0MC4zNSAxNzYuNSBMIDQzOC4xIDE4MSBMIDQ0MC4zNSAxODUuNSBaIiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+CiAgICAgICAgPHJlY3QgeD0iMjgiIHk9IjgxIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjOTlmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIgcG9pbnRlci1ldmVudHM9ImFsbCIvPgogICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjUgLTAuNSkiPgogICAgICAgICAgICA8c3dpdGNoPgogICAgICAgICAgICAgICAgPGZvcmVpZ25PYmplY3QgcG9pbnRlci1ldmVudHM9Im5vbmUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHJlcXVpcmVkRmVhdHVyZXM9Imh0dHA6Ly93d3cudzMub3JnL1RSL1NWRzExL2ZlYXR1cmUjRXh0ZW5zaWJpbGl0eSIgc3R5bGU9Im92ZXJmbG93OiB2aXNpYmxlOyB0ZXh0LWFsaWduOiBsZWZ0OyI+CiAgICAgICAgICAgICAgICAgICAgPGRpdiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgc3R5bGU9ImRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiB1bnNhZmUgY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IHVuc2FmZSBjZW50ZXI7IHdpZHRoOiAzOThweDsgaGVpZ2h0OiAxcHg7IHBhZGRpbmctdG9wOiAxMDFweDsgbWFyZ2luLWxlZnQ6IDI5cHg7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBkYXRhLWRyYXdpby1jb2xvcnM9ImNvbG9yOiAjMDAwMDAwOyAiIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LXNpemU6IDBweDsgdGV4dC1hbGlnbjogY2VudGVyOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OiBpbmxpbmUtYmxvY2s7IGZvbnQtc2l6ZTogMTJweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsgY29sb3I6IHJnYigwLCAwLCAwKTsgbGluZS1oZWlnaHQ6IDEuMjsgcG9pbnRlci1ldmVudHM6IGFsbDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgb3ZlcmZsb3ctd3JhcDogbm9ybWFsOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRGF0YXR5cGUgU3RydWN0IERlZmF1bHQgU3RvcmFnZSBTbG90IE4yCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2ZvcmVpZ25PYmplY3Q+CiAgICAgICAgICAgICAgICA8dGV4dCB4PSIyMjgiIHk9IjEwNSIgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9IkhlbHZldGljYSIgZm9udC1zaXplPSIxMnB4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4KICAgICAgICAgICAgICAgICAgICBEYXRhdHlwZSBTdHJ1Y3QgRGVmYXVsdCBTdG9yYWdlIFNsb3QgTjIKICAgICAgICAgICAgICAgIDwvdGV4dD4KICAgICAgICAgICAgPC9zd2l0Y2g+CiAgICAgICAgPC9nPgogICAgICAgIDxyZWN0IHg9IjI4IiB5PSIxNjEiIHdpZHRoPSIyMDAiIGhlaWdodD0iNDAiIGZpbGw9IiNmZmZmOTkiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuNSAtMC41KSI+CiAgICAgICAgICAgIDxzd2l0Y2g+CiAgICAgICAgICAgICAgICA8Zm9yZWlnbk9iamVjdCBwb2ludGVyLWV2ZW50cz0ibm9uZSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgcmVxdWlyZWRGZWF0dXJlcz0iaHR0cDovL3d3dy53My5vcmcvVFIvU1ZHMTEvZmVhdHVyZSNFeHRlbnNpYmlsaXR5IiBzdHlsZT0ib3ZlcmZsb3c6IHZpc2libGU7IHRleHQtYWxpZ246IGxlZnQ7Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hodG1sIiBzdHlsZT0iZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IHVuc2FmZSBjZW50ZXI7IGp1c3RpZnktY29udGVudDogdW5zYWZlIGNlbnRlcjsgd2lkdGg6IDE5OHB4OyBoZWlnaHQ6IDFweDsgcGFkZGluZy10b3A6IDE4MXB4OyBtYXJnaW4tbGVmdDogMjlweDsiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGRhdGEtZHJhd2lvLWNvbG9ycz0iY29sb3I6ICMwMDAwMDA7ICIgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IGZvbnQtc2l6ZTogMHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6IGlubGluZS1ibG9jazsgZm9udC1zaXplOiAxMnB4OyBmb250LWZhbWlseTogSGVsdmV0aWNhOyBjb2xvcjogcmdiKDAsIDAsIDApOyBsaW5lLWhlaWdodDogMS4yOyBwb2ludGVyLWV2ZW50czogYWxsOyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBvdmVyZmxvdy13cmFwOiBub3JtYWw7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRGF0YXR5cGUgU3RydWN0IERlZmF1bHQgU3RvcmFnZSBTbG90IE4xCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9zcGFuPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9mb3JlaWduT2JqZWN0PgogICAgICAgICAgICAgICAgPHRleHQgeD0iMTI4IiB5PSIxODUiIGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EiIGZvbnQtc2l6ZT0iMTJweCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICAgICAgICAgICAgICAgICAgRGF0YXR5cGUgU3RydWN0IERlZmF1bHQgU3RvcmFnZSBTLi4uCiAgICAgICAgICAgICAgICA8L3RleHQ+CiAgICAgICAgICAgIDwvc3dpdGNoPgogICAgICAgIDwvZz4KICAgICAgICA8cmVjdCB4PSIyOCIgeT0iMzIxIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZmY5OWZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIgcG9pbnRlci1ldmVudHM9ImFsbCIvPgogICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjUgLTAuNSkiPgogICAgICAgICAgICA8c3dpdGNoPgogICAgICAgICAgICAgICAgPGZvcmVpZ25PYmplY3QgcG9pbnRlci1ldmVudHM9Im5vbmUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHJlcXVpcmVkRmVhdHVyZXM9Imh0dHA6Ly93d3cudzMub3JnL1RSL1NWRzExL2ZlYXR1cmUjRXh0ZW5zaWJpbGl0eSIgc3R5bGU9Im92ZXJmbG93OiB2aXNpYmxlOyB0ZXh0LWFsaWduOiBsZWZ0OyI+CiAgICAgICAgICAgICAgICAgICAgPGRpdiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgc3R5bGU9ImRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiB1bnNhZmUgY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IHVuc2FmZSBjZW50ZXI7IHdpZHRoOiAzOThweDsgaGVpZ2h0OiAxcHg7IHBhZGRpbmctdG9wOiAzNDFweDsgbWFyZ2luLWxlZnQ6IDI5cHg7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBkYXRhLWRyYXdpby1jb2xvcnM9ImNvbG9yOiAjMDAwMDAwOyAiIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LXNpemU6IDBweDsgdGV4dC1hbGlnbjogY2VudGVyOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OiBpbmxpbmUtYmxvY2s7IGZvbnQtc2l6ZTogMTJweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsgY29sb3I6IHJnYigwLCAwLCAwKTsgbGluZS1oZWlnaHQ6IDEuMjsgcG9pbnRlci1ldmVudHM6IGFsbDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgb3ZlcmZsb3ctd3JhcDogbm9ybWFsOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSW50ZXJmYWNlIEJvdW5kIFNvdHJhZ2UgU2xvdAogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9mb3JlaWduT2JqZWN0PgogICAgICAgICAgICAgICAgPHRleHQgeD0iMjI4IiB5PSIzNDUiIGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EiIGZvbnQtc2l6ZT0iMTJweCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICAgICAgICAgICAgICAgICAgSW50ZXJmYWNlIEJvdW5kIFNvdHJhZ2UgU2xvdAogICAgICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8L3N3aXRjaD4KICAgICAgICA8L2c+CiAgICAgICAgPHJlY3QgeD0iMjgiIHk9IjI4MSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZmY5OTk5IiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIgcG9pbnRlci1ldmVudHM9ImFsbCIvPgogICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0wLjUgLTAuNSkiPgogICAgICAgICAgICA8c3dpdGNoPgogICAgICAgICAgICAgICAgPGZvcmVpZ25PYmplY3QgcG9pbnRlci1ldmVudHM9Im5vbmUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHJlcXVpcmVkRmVhdHVyZXM9Imh0dHA6Ly93d3cudzMub3JnL1RSL1NWRzExL2ZlYXR1cmUjRXh0ZW5zaWJpbGl0eSIgc3R5bGU9Im92ZXJmbG93OiB2aXNpYmxlOyB0ZXh0LWFsaWduOiBsZWZ0OyI+CiAgICAgICAgICAgICAgICAgICAgPGRpdiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94aHRtbCIgc3R5bGU9ImRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiB1bnNhZmUgY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IHVuc2FmZSBjZW50ZXI7IHdpZHRoOiA3OHB4OyBoZWlnaHQ6IDFweDsgcGFkZGluZy10b3A6IDMwMXB4OyBtYXJnaW4tbGVmdDogMjlweDsiPgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGRhdGEtZHJhd2lvLWNvbG9ycz0iY29sb3I6ICMwMDAwMDA7ICIgc3R5bGU9ImJveC1zaXppbmc6IGJvcmRlci1ib3g7IGZvbnQtc2l6ZTogMHB4OyB0ZXh0LWFsaWduOiBjZW50ZXI7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9ImRpc3BsYXk6IGlubGluZS1ibG9jazsgZm9udC1zaXplOiAxMnB4OyBmb250LWZhbWlseTogSGVsdmV0aWNhOyBjb2xvcjogcmdiKDAsIDAsIDApOyBsaW5lLWhlaWdodDogMS4yOyBwb2ludGVyLWV2ZW50czogYWxsOyB3aGl0ZS1zcGFjZTogbm9ybWFsOyBvdmVyZmxvdy13cmFwOiBub3JtYWw7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBJbnRlcmZhY2UgSUQgQnl0ZXM0CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2ZvcmVpZ25PYmplY3Q+CiAgICAgICAgICAgICAgICA8dGV4dCB4PSI2OCIgeT0iMzA1IiBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0iSGVsdmV0aWNhIiBmb250LXNpemU9IjEycHgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPgogICAgICAgICAgICAgICAgICAgIEludGVyZmFjZSBJRC4uLgogICAgICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8L3N3aXRjaD4KICAgICAgICA8L2c+CiAgICAgICAgPHJlY3QgeD0iMTA4IiB5PSIyODEiIHdpZHRoPSIzMjAiIGhlaWdodD0iNDAiIGZpbGw9IiM5OWZmOTkiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBwb2ludGVyLWV2ZW50cz0iYWxsIi8+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTAuNSAtMC41KSI+CiAgICAgICAgICAgIDxzd2l0Y2g+CiAgICAgICAgICAgICAgICA8Zm9yZWlnbk9iamVjdCBwb2ludGVyLWV2ZW50cz0ibm9uZSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgcmVxdWlyZWRGZWF0dXJlcz0iaHR0cDovL3d3dy53My5vcmcvVFIvU1ZHMTEvZmVhdHVyZSNFeHRlbnNpYmlsaXR5IiBzdHlsZT0ib3ZlcmZsb3c6IHZpc2libGU7IHRleHQtYWxpZ246IGxlZnQ7Ij4KICAgICAgICAgICAgICAgICAgICA8ZGl2IHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hodG1sIiBzdHlsZT0iZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IHVuc2FmZSBjZW50ZXI7IGp1c3RpZnktY29udGVudDogdW5zYWZlIGNlbnRlcjsgd2lkdGg6IDMxOHB4OyBoZWlnaHQ6IDFweDsgcGFkZGluZy10b3A6IDMwMXB4OyBtYXJnaW4tbGVmdDogMTA5cHg7Ij4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBkYXRhLWRyYXdpby1jb2xvcnM9ImNvbG9yOiAjMDAwMDAwOyAiIHN0eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBmb250LXNpemU6IDBweDsgdGV4dC1hbGlnbjogY2VudGVyOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IHN0eWxlPSJkaXNwbGF5OiBpbmxpbmUtYmxvY2s7IGZvbnQtc2l6ZTogMTJweDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsgY29sb3I6IHJnYigwLCAwLCAwKTsgbGluZS1oZWlnaHQ6IDEuMjsgcG9pbnRlci1ldmVudHM6IGFsbDsgd2hpdGUtc3BhY2U6IG5vcm1hbDsgb3ZlcmZsb3ctd3JhcDogbm9ybWFsOyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRGlhbW9uZCBTdG9yYWdlIFN0cnVjdCBEYXRhdHlwZSBOXlggWE9SIFN0b3JhZ2UgU2xvdAogICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgPC9mb3JlaWduT2JqZWN0PgogICAgICAgICAgICAgICAgPHRleHQgeD0iMjY4IiB5PSIzMDUiIGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EiIGZvbnQtc2l6ZT0iMTJweCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICAgICAgICAgICAgICAgICAgRGlhbW9uZCBTdG9yYWdlIFN0cnVjdCBEYXRhdHlwZSBOXlggWE9SIFN0b3JhZ2UgU2xvdAogICAgICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8L3N3aXRjaD4KICAgICAgICA8L2c+CiAgICA8L2c+CiAgICA8c3dpdGNoPgogICAgICAgIDxnIHJlcXVpcmVkRmVhdHVyZXM9Imh0dHA6Ly93d3cudzMub3JnL1RSL1NWRzExL2ZlYXR1cmUjRXh0ZW5zaWJpbGl0eSIvPgogICAgICAgIDxhIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsLTUpIiB4bGluazpocmVmPSJodHRwczovL3d3dy5kaWFncmFtcy5uZXQvZG9jL2ZhcS9zdmctZXhwb3J0LXRleHQtcHJvYmxlbXMiIHRhcmdldD0iX2JsYW5rIj4KICAgICAgICAgICAgPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMHB4IiB4PSI1MCUiIHk9IjEwMCUiPgogICAgICAgICAgICAgICAgVmlld2VyIGRvZXMgbm90IHN1cHBvcnQgZnVsbCBTVkcgMS4xCiAgICAgICAgICAgIDwvdGV4dD4KICAgICAgICA8L2E+CiAgICA8L3N3aXRjaD4KPC9zdmc+" alt="daosys architecture 01 ase 01 storage 01 deterministically dynamic storage allocation.drawio">
 </div>
 </div>
-<div class="paragraph data-line-232">
+<div class="paragraph data-line-253">
 <p>The storage slots for the discrete data types are combined using a bitwise XOR operation.
 This does abstract out the exact order of the datatypes in the Diamond Storage struct.
 This is abstraction is intentional as it should catch an unsafe ordering of state variables during testing.
@@ -728,11 +762,126 @@ Together, this allows for a on-chain factory that can deploy proxy and initializ
 </div>
 </div>
 </div>
+<div class="sect1 data-line-264">
+<h2 id="_architecture">4. Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-266">
+<p>The Autonomous Service Engine uses a on-chain factory to deploy minimal proxies of a customized Diamond Proxy that is configured with facets as defined by the user.
+Because of the customization that deviates sharply from the Diamond standard as defined in <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a> the defining terms are changed.
+Under the ASE framework, the customized Diamond proxies are termed Service Proxies.
+The Facets defined in <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a> are termed Services.</p>
+</div>
+<div class="paragraph data-line-271">
+<p>The distinction is in two factors.
+Delegate Service Proxies are immutable.
+The functions defined in <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a> to reconfigure a proxy to use new facets is not available by default in a Service Proxy.
+This is done because there is not acceptable solution to the risk updates present to users of the proxy.
+A Service Proxy may be configured with a Service that exposes a <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a> compliant interface for private instances.
+The ASE will only deploy reconfiguration Services for a Service Proxy that includes an explicit ACL Service.</p>
+</div>
+<div class="paragraph data-line-278">
+<p>Second, Service Proxies are wrapped in a Minimal Proxy as defined in <a href="https://eips.ethereum.org/EIPS/eip-1167" data-href="https://eips.ethereum.org/EIPS/eip-1167">ERC-1167</a>.
+The Service Proxy logic is itself a Delegate Service.
+The Service Proxy Factory uses <a href="https://eips.ethereum.org/EIPS/eip-1167" data-href="https://eips.ethereum.org/EIPS/eip-1167">ERC-1167</a> to deploy a Minimal Proxy that directs to the Service Proxy logic.
+This minimizes the transaction fee for deploying new proxies with a minimal increase in per-transaction fees for use.
+This also allows easier verification that a new Service Proxy is reusing proven code.
+Finally, for particularly sensitive Services, a circuit breaker can be included to protect all Service Proxies consuming that service.
+For this reason, Services will implemented to be as minimal as possible.
+With emergency withdrawal or liquidation services graceful degradation for if a service is disabled.</p>
+</div>
+<div class="sect2 data-line-287">
+<h3 id="_delegate_services">4.1. Delegate Services</h3>
+<div class="paragraph data-line-289">
+<p>Delegate Services replace the Facets defined in <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a>.
+Delegate Services define a strict storage allocation and access standard beyond the theory presented in <a href="https://eips.ethereum.org/EIPS/eip-2535" data-href="https://eips.ethereum.org/EIPS/eip-2535">ERC-2535</a>.
+A Service is a smart-contract or library implemented following the Deterministically Dynamic Storage Allocation standard.
+A Service also reports the factory that deployed that contract and the salt used during deployment.
+This way the recalculation of the address from the factory init code hash and salt can be used to verify new Services as an implicit ACL.</p>
+</div>
+<div class="paragraph data-line-295">
+<p>This means that the deployment process for new Services deviates from industry standard.
+New Services are deployed as compiled bytecode passed to the Service Proxy Factory as the argument for the deployment function.
+The Service Proxy Factory then instantiates that bytecode as a new contract.
+ASE compliant Services must include the ASEServiceBootstrapper library to retrieve the address salt to initialize the Service.
+This should be done by delegating to the canonical external library deployment.
+ASE compliant external libraries may precalculate their address salt and store it as a constant.
+The standard Service initialization functions must still be implemented, but may hard code the values and return values since they can not store state.</p>
+</div>
+<div class="paragraph data-line-303">
+<p>All Services are required to implement <a href="https://eips.ethereum.org/EIPS/eip-165" data-href="https://eips.ethereum.org/EIPS/eip-165">ERC-165</a> including the Service extension that enumerates the functions.
+The Service extension to <a href="https://eips.ethereum.org/EIPS/eip-165" data-href="https://eips.ethereum.org/EIPS/eip-165">ERC-165</a> includes a per interface enumeration of the function selectors that define the interface ID.
+Additionally, there is an enumeration of all the function selectors across all interface IDs, and a ServiceDef struct that includes the information for initializing a Service Proxy to consume the Service.</p>
+</div>
+</div>
+<div class="sect2 data-line-307">
+<h3 id="_service_registry">4.2. Service Registry</h3>
+<div class="paragraph data-line-309">
+<p>Services are published through the ASE&#8217;s Service Registry.
+When a new Service is deployed through the Service Proxy Factory, the Service Registry is updated with information about the new Service.
+This includes mapping the new Service address to the bitwise XOR of the interfaces the Service exposes.
+This defines the Service ID that is used to define the Service Proxy configuration used to deploy new Service Proxies.
+Including any declared Service dependencies for the new service.
+In addition to the custom interface, the Service Registry also implements the <a href="https://eips.ethereum.org/EIPS/eip-1820" data-href="https://eips.ethereum.org/EIPS/eip-1820">ERC-1820</a> Standard as best as possible.
+The deviation from ERC-1820 is documented in it&#8217;s own section.</p>
+</div>
+<div class="paragraph data-line-317">
+<p>The foundation for identifying and consuming Services is the interface ID as computed by the Solidity compiler.
+This is explained in <a href="https://eips.ethereum.org/EIPS/eip-165" data-href="https://eips.ethereum.org/EIPS/eip-165">ERC-165</a>.
+The ASE relies on <a href="https://eips.ethereum.org/EIPS/eip-165" data-href="https://eips.ethereum.org/EIPS/eip-165">ERC-165</a> interface IDs because of the computation from the bytecode.
+This eliminates potential conflicts from the arbitrary naming convention proposed in <a href="https://eips.ethereum.org/EIPS/eip-1820" data-href="https://eips.ethereum.org/EIPS/eip-1820">ERC-1820</a>.</p>
+</div>
+<div class="paragraph data-line-322">
+<p>In the context of the Service Registry, the limitation of not being able to include duplicate Services for an interface ID is intended.
+This can forces the inclusion of distinct identifiers is a duplicate is required.
+And facilitates reuse of external Services with internal Services.
+Services should include their own interface that extends an existing on if they tightly couple an external interface with domain specific logic.
+And example would be the token standard in <a href="https://eips.ethereum.org/EIPS/eip-20" data-href="https://eips.ethereum.org/EIPS/eip-20">ERC-20</a> and how it does not dictate the internal behavior.
+This has allowed for a wide variety of token logic that still conforms with the standard.
+To handle deploying multiple Services that all expose the <a href="https://eips.ethereum.org/EIPS/eip-20" data-href="https://eips.ethereum.org/EIPS/eip-20">ERC-20</a> interface, new Services should extend the interface with domain specific interfaces.</p>
+</div>
+<div class="paragraph data-line-330">
+<p>A concrete example would be a Basic <a href="https://eips.ethereum.org/EIPS/eip-20" data-href="https://eips.ethereum.org/EIPS/eip-20">ERC-20</a> token compared to a rebasing <a href="https://eips.ethereum.org/EIPS/eip-20" data-href="https://eips.ethereum.org/EIPS/eip-20">ERC-20</a> token.
+A rebasing token would differentiate itself with one or more interface extensions that exposes functions specific to the rebasing implementation.
+This also applies to Services that compose existing Services in novel configurations.
+They can distinguish themselves from the base Service by defining an interface that composes all the exposed interfaces.
+If a new Service links to an external library it only needs to include external library functions as an interface extension if they will be directly mapped in the Service Proxy when configuring the service.</p>
+</div>
+<div class="paragraph data-line-336">
+<p>The Service Registry exposes the stored mapping of a Service ID to the Service Address.
+While this is also computable as the Service ID is the salt for deploying a new Service, it&#8217;s included for completeness with the other Service metadata.
+The Service Registry also exposes the mapping of Services that serve a distinct interface.
+This results in a rather large array of addresses that is not feasible to read on-chain.
+This is provided for off-chain resources to provide a simple reference of all available Services for an interface ID.
+Further, an enumeration of the functions declared in an interface is presented to facilitate off-chain resources searching the Service Registry.</p>
+</div>
+</div>
+<div class="sect2 data-line-343">
+<h3 id="_service_proxy">4.3. Service Proxy</h3>
+<div class="paragraph data-line-345">
+<p>The Service Proxy is a special Service that is the target of the Minimal Proxies deployed by the Factory.
+It is published in the Service Registry under the invalid interface ID as defined in <a href="https://eips.ethereum.org/EIPS/eip-165" data-href="https://eips.ethereum.org/EIPS/eip-165">ERC-165</a>.
+This allows for later factory instances to override the original Service Proxy implementation is desired.
+Because of this reserved interface ID, there is no need to declare the Service Proxy in a new Service Proxy configuration.</p>
+</div>
+<div class="paragraph data-line-350">
+<p>The Service Proxy implements a <code>fallback() payable</code> function.
+This <code>fallback() payable</code> function uses the implicit variable <code>msg.sig</code> to lookup which address to use as the target of a <code>DELEGATECALL</code>.
+This is the Delegate Service configured when the Service Proxy was deployed from the factory.
+The transaction data is forwarded to the target Delegate Service.
+The target Delegate Service then executes it&#8217;s implemented logic using the storage of the Service Proxy that issued the <code>DELEGATECALL</code>.</p>
+</div>
+<div class="paragraph data-line-356">
+<p>A Service Proxy may need more complex transaction processing that is domain specific.
+This is defined in the Transaction Router design pattern.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.1<br>
-Last updated 2022-03-29 23:58:29 -0700
+Last updated 2022-04-01 15:05:44 -0700
 </div>
 </div>
 <script type="text/x-mathjax-config">

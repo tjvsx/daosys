@@ -3,41 +3,47 @@
 pragma solidity ^0.8.0;
 
 import {
-  Uint256Counter,
-  Uint256CounterUtils
-} from "../../counters/Uint256Counter.sol";
+  UInt256Counter,
+  UInt256CounterUtils
+} from "../../counters/UInt256Counter.sol";
 
-library AddressToUint256Counter {
+library AddressToUInt256Counter {
 
-  // NOTE Should only use language primitives as key pending research on the consistency of using a struct.
+  /*
+   * @note Only primitives are used because using a struct would result in using the storage slot
+   */
   struct Layout {
-    mapping(address => Uint256Counter.Layout ) counterForAddress;
+    mapping(address => UInt256Counter.Layout ) counterForAddress;
   }
 
-  function _layout(bytes32 salt) pure internal returns (AddressToUint256Counter.Layout storage layout) {
-    bytes32 saltedSlot =
-      salt 
-      ^ Uint256CounterUtils._structSlot();
-    assembly{ layout.slot := saltedSlot }
-  }
 }
 
-library AddressToUint256CounterUtils {
+library AddressToUInt256CounterUtils {
 
-  using AddressToUint256CounterUtils for AddressToUint256Counter.Layout;
+  using AddressToUInt256CounterUtils for AddressToUInt256Counter.Layout;
 
-  bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(AddressToUint256Counter).creationCode);
+  bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(AddressToUInt256Counter).creationCode);
 
   function _structSlot() pure internal returns (bytes32 structSlot) {
-    structSlot = STRUCT_STORAGE_SLOT;
+    structSlot = STRUCT_STORAGE_SLOT
+      ^ UInt256CounterUtils._structSlot();
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( AddressToUint256Counter.Layout storage layout ) {
-    layout = AddressToUint256Counter._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( AddressToUInt256Counter.Layout storage layout ) {
+    bytes32 saltedSlot =
+      salt
+      ^ AddressToUInt256CounterUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _unsafeReadCountForAddress(
-    AddressToUint256Counter.Layout storage layout,
+    AddressToUInt256Counter.Layout storage layout,
     address addressQuery
   ) internal returns (uint256 lastCount) {
     lastCount = layout.counterForAddress[addressQuery].count.value;

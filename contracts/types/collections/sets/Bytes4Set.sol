@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-
 pragma solidity ^0.8.0;
 
 /* -------------------------------------------------------------------------- */
@@ -15,15 +14,7 @@ library Bytes4Set {
   }
 
   struct Layout {
-    Bytes4Set.Enumerable bytes4Set;
-  }
-
-  /*
-  NOTE Implemented here as the binding of the Layout struct is tightly coupled
-    to the binding of a storage slot.
-   */
-  function _layout( bytes32 slot ) pure internal returns (Bytes4Set.Layout storage layout ) {
-    assembly{ layout.slot := slot }
+    Bytes4Set.Enumerable set;
   }
 
 }
@@ -46,8 +37,17 @@ library Bytes4SetUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( Bytes4Set.Layout storage layout ) {
-    layout = Bytes4Set._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( Bytes4Set.Layout storage layout ) {
+    bytes32 saltedSlot =
+      salt
+      ^ Bytes4SetUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _at(

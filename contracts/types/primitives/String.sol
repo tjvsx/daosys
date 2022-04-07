@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 
 /* -------------------------------------------------------------------------- */
-/*                             SECTION Bytes4                                 */
+/*                             SECTION String                                 */
 /* -------------------------------------------------------------------------- */
 
 library String {
@@ -13,21 +13,13 @@ library String {
     string value;
   }
 
-  /*
-  NOTE Implemented here as the binding of the Layout struct is tightly coupled
-    to the binding of a storage slot.
-   */
-  function _layout( bytes32 slot ) pure internal returns ( String.Layout storage layout ) {
-    assembly{ layout.slot := slot }
-  }
-
 }
 /* -------------------------------------------------------------------------- */
-/*                             !SECTION Bytes4                                */
+/*                             !SECTION String                                */
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
-/*                             SECTION Bytes4Utils                            */
+/*                             SECTION StringUtils                            */
 /* -------------------------------------------------------------------------- */
 
 library StringUtils {
@@ -38,11 +30,19 @@ library StringUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( String.Layout storage layout ) {
-    layout = String._layout(slot);
+  /**
+   * @notice Could be optimized by having the exposing interface caclulate and store
+   *  the storage slot as a constant.
+   *  Storage slot is computed during runtime to facilitate development during
+   *  standardization.
+   */
+  function _layout( bytes32 salt ) pure internal returns ( String.Layout storage layout ) {
+    bytes32 saltedSlot = salt
+      ^ StringUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
 }
 /* -------------------------------------------------------------------------- */
-/*                            !SECTION Bytes4Utils                            */
+/*                            !SECTION StringUtils                            */
 /* -------------------------------------------------------------------------- */
