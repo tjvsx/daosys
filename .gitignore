@@ -11,3 +11,7 @@ cache
 artifacts
 
 .DS_Store
+
+#pyplot
+__pycache__
+*.pyc
