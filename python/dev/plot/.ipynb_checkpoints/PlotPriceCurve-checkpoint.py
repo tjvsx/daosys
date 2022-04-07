@@ -30,26 +30,28 @@ class PlotPriceCurve():
         y_val = self.__pCurve.y_val(x_val)
         return x_val, y_val
         
-    def apply(self, p):
+    def apply(self, p, p_label = 'curve'):
         x_bound, y_bound = self.gen_bounds(p)
         x_val, y_val = self.gen_data(x_bound)
         fig, ax = plt.subplots(figsize=(10, 10))
-        plt.plot(x_val, y_val, label='curve')
+        plt.plot(x_val, y_val, label=p_label)
         plt.ylim(0, y_bound)
-        plt.xlim(0, x_bound)  
+        plt.xlim(0, x_bound) 
+        plt.legend()
         
-    def apply_next(self, p, L): 
+    def apply_next(self, p, L, p_label = 'curve'): 
         self.__pCurve = PriceCurve(L)
         self.__cpt = ConstantProductTrade(L)
         x_bound, y_bound = self.gen_bounds(p)
         x_val, y_val = self.gen_data(x_bound)        
-        plt.plot(x_val, y_val, label='curve')
+        plt.plot(x_val, y_val, label=p_label)
         plt.ylim(0, y_bound)
-        plt.xlim(0, x_bound)         
+        plt.xlim(0, x_bound)
+        plt.legend()
         
     def plot_trade(self, price, delta, ltype = 'b--', p_lines = True):
         (x_swap,y_swap) = self.__cpt.swap_point(price, delta)  
-        plt.scatter([x_swap], [y_swap], marker='o', color='green',s=25, label = 'swaps')
+        plt.scatter([x_swap], [y_swap], marker='o', color='green',s=25)
         if(p_lines): 
             plt.plot([self.__cpt.f(y_swap), x_swap],[y_swap, y_swap],ltype,lw=0.5)
             plt.plot([x_swap, x_swap],[y_swap, self.__cpt.f(x_swap)],ltype,lw=0.5)
