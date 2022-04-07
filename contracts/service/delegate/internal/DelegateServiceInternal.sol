@@ -22,6 +22,11 @@ abstract contract DelegateServiceInternal {
       );
   }
 
-  // function _getServiceDef() view 
+  function _getServiceDef(
+    bytes32 storageSlot
+  ) view internal returns (bytes4 interfaceId, bytes4[] memory functionSelectors) {
+    (interfaceId, functionSelectors) = DelegateServiceStorageUtils._layout(storageSlot)
+      ._getServiceDef();
+  }
 
 }

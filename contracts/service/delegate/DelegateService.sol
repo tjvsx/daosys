@@ -8,7 +8,7 @@ import {
 } from "contracts/service/delegate/internal/DelegateServiceInternal.sol";
 import {IDelegateService} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
-abstract contract DelegateService is DelegateServiceInternal {
+abstract contract DelegateService is IDelegateService, DelegateServiceInternal {
 
   using DelegateServiceStorageUtils for DelegateServiceStorage.Layout;
 
@@ -23,6 +23,10 @@ abstract contract DelegateService is DelegateServiceInternal {
     );
   }
 
-  // function getServiceDef() view ext
+  function getServiceDef() view external returns (ServiceDef memory serviceDef) {
+    (serviceDef.interfaceId, serviceDef.functionSelectors) = DelegateServiceStorageUtils
+      ._layout(type(IDelegateService).interfaceId)
+      ._getServiceDef();
+  }
 
 }
