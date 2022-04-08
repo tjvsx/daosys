@@ -1,0 +1,26 @@
+= Build Process
+ifndef::compositing[]
+:author: cyotee doge
+:email: cyotee@syscoin.org
+:revdate: 2022-03-25
+:revnumber: 0.1
+:revremark: Initial draft.
+:toc:
+:toclevels: 6
+:sectnums:
+:data-uri:
+:stem:
+
+:imagesdir: ../../
+:compositing:
+endif::[]
+
+[source]
+----
+yarn install
+----
+
+[source]
+----
+yarn clean-build
+----
