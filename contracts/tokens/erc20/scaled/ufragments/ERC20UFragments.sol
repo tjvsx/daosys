@@ -5,7 +5,7 @@ import {ERC20UFragmentsInternal} from "./internal/ERC20UFragmentsInternal.sol";
 import {ERC20Metadata} from "../../metadata/ERC20Metadata.sol";
 import {ERC20Account} from "../../account/ERC20Account.sol";
 import {IERC20UFragments} from "contracts/tokens/erc20/scaled/ufragments/interfaces/IERC20UFragments.sol";
-// import {IERC20} from "../../interfaces/IERC20.sol";
+import {IERC20} from "../../interfaces/IERC20.sol";
 import {FullMath} from "../../../../math/FullMath.sol";
 
 contract ERC20UFragments
@@ -98,15 +98,15 @@ contract ERC20UFragments
     string memory newName,
     string memory newSymbol
   ) external {_setName(
-      type(IERC20UFragments).interfaceId,
+      type(IERC20).interfaceId,
       newName
     );
     _setSymbol(
-      type(IERC20UFragments).interfaceId,
+      type(IERC20).interfaceId,
       newSymbol
     );
     _setDecimals(
-      type(IERC20UFragments).interfaceId,
+      type(IERC20).interfaceId,
       DECIMALS
     );
 
