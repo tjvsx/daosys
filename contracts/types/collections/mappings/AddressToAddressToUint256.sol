@@ -13,10 +13,6 @@ library AddressToAddressToUInt256 {
     mapping(address => mapping(address => UInt256.Layout)) value;
   }
 
-  // function _layout(bytes32 slot) pure internal returns (AddressToAddressToUint256.Layout storage layout) {
-  //   assembly{ layout.slot := slot }
-  // }
-
 }
 
 library AddressToAddressToUInt256Utils {
