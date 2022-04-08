@@ -17,11 +17,11 @@ import {
     WETH9,
     WETH9__factory,
     IERC20
-} from '../../../../../typechain';
+} from '../../../../../../../typechain';
 import { trace } from 'console';
 import exp from 'constants';
 
-import { initializeMooniswap, createMooniswapPair, mooniswapPairCreateArgs } from '../../../../fixtures/mooniswap.fixture'
+import { initializeMooniswap, createMooniswapPair, mooniswapPairCreateArgs } from '../../../../../../fixtures/mooniswap.fixture'
 
 
 

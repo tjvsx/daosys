@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import {Math} from "../../../math/Math.sol";
-import {IUniswapV2Pair} from "../../../protocols/dexes/uniswap/v2/uniswap-v2-core/interfaces/IUniswapV2Pair.sol";
-import {ERC20Basic, IERC20} from '../basic/ERC20Basic.sol';
+import {Math} from "contracts/math/Math.sol";
+import {IUniswapV2Pair} from "contracts/test/protocols/dexes/uniswap/v2/uniswap-v2-core/interfaces/IUniswapV2Pair.sol";
+import {ERC20Basic, IERC20} from 'contracts/tokens/erc20/basic/ERC20Basic.sol';
 
 contract ERC20Managed is ERC20Basic {
   using Math for uint256;
