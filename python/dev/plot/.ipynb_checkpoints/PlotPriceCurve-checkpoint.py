@@ -12,6 +12,8 @@ class PlotPriceCurve():
         
     def set_liquidity(self, L):
         self.__L = L 
+        self.__pCurve = PriceCurve(L)
+        self.__cpt = ConstantProductTrade(L)
         
     def set_cpt(self, cpt): 
         self.__cpt = cpt
@@ -20,7 +22,7 @@ class PlotPriceCurve():
         self.__pCurve = pCurve        
  
     def gen_bounds(self, p):
-        (x_pnt, y_pnt) = self.__cpt.inflection_point(p)
+        x_pnt, y_pnt = self.__cpt.inflection_point(p)
         x_bound = self.__pCurve.get_factor()*x_pnt
         y_bound = self.__pCurve.get_factor()*y_pnt
         return (x_bound,y_bound)
@@ -40,8 +42,7 @@ class PlotPriceCurve():
         plt.legend()
         
     def apply_next(self, p, L, p_label = 'curve'): 
-        self.__pCurve = PriceCurve(L)
-        self.__cpt = ConstantProductTrade(L)
+        self.set_liquidity(L)
         x_bound, y_bound = self.gen_bounds(p)
         x_val, y_val = self.gen_data(x_bound)        
         plt.plot(x_val, y_val, label=p_label)

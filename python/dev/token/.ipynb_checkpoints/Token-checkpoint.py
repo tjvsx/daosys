@@ -38,6 +38,10 @@ class Token():
     def gen_address(self):
         return self.__addresses.gen_key()
     
+    def get_balance_deposits(self):
+        deposits = self.__addresses.get_balances()
+        return sum(list(deposits.values()))
+    
     def deposit(self, delta, address):
         
         if(not self.__addresses.address_exist(address)):

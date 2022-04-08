@@ -10,10 +10,10 @@ class ConstantProductTrade():
 
     def __y_p(self, p):
         return self.__L*(p ** 0.5)
-
+       
     def set_liquidity(self, L):
-        self.__L = L     
-    
+        self.__L = L
+            
     def inflection_point(self, price):
         x_pnt = self.__x_p(price)
         y_pnt = self.__y_p(price)
