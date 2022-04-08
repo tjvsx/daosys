@@ -15,3 +15,5 @@ artifacts
 #pyplot
 __pycache__
 *.pyc
+
+.openzeppelin/
