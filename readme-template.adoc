@@ -1,0 +1,16 @@
+= DAOSYS README
+:author: cyotee doge
+:email: cyotee@syscoin.org
+:revdate: 2022-04-08
+:revnumber: 0.1
+:revremark: Initial draft.
+:toc:
+:toclevels: 6
+:sectnums:
+:data-uri:
+:stem:
+
+:imagesdir: ./
+:compositing:
+
+include::docs/architecture/daosys-architecture.adoc[leveloffset=+1]

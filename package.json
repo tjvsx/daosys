@@ -10,7 +10,7 @@
   "scripts": {
     "coverage": "yarn run hardhat coverage",
     "build": "yarn run hardhat compile && lerna run tsc",
-    "clean-build": "yarn run hardhat clean && yarn run hardhat compile && yarn run hardhat test --logs",
+    "clean-build": "yarn run hardhat clean && yarn run hardhat compile && yarn run hardhat test --logs && asciidoctor-reducer --preserve-conditionals -o README.adoc readme-template.adoc",
     "clean": "yarn run hardhat clean",
     "compile": "yarn run hardhat compile",
     "typechain": "yarn run hardhat typechain",
