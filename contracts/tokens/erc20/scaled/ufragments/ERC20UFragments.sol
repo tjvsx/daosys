@@ -4,12 +4,13 @@ pragma solidity ^0.8.0;
 import {ERC20UFragmentsInternal} from "./internal/ERC20UFragmentsInternal.sol";
 import {ERC20Metadata} from "../../metadata/ERC20Metadata.sol";
 import {ERC20Account} from "../../account/ERC20Account.sol";
+import {IERC20UFragments} from "contracts/tokens/erc20/scaled/ufragments/interfaces/IERC20UFragments.sol";
 import {IERC20} from "../../interfaces/IERC20.sol";
 import {FullMath} from "../../../../math/FullMath.sol";
 
 contract ERC20UFragments
   is
-    IERC20,
+    IERC20UFragments,
     ERC20UFragmentsInternal,
     ERC20Account,
     ERC20Metadata
@@ -17,36 +18,36 @@ contract ERC20UFragments
 
   using FullMath for int256;
 
-  function name() override(IERC20) view external returns (string memory tokenName) {
-    tokenName = _name();
+  function name() override(IERC20UFragments) view external returns (string memory tokenName) {
+    tokenName = _name(type(IERC20).interfaceId);
   }
 
-  function symbol() override(IERC20) view external returns (string memory tokenSymbol) {
-    tokenSymbol = _symbol();
+  function symbol() override(IERC20UFragments) view external returns (string memory tokenSymbol) {
+    tokenSymbol = _symbol(type(IERC20).interfaceId);
   }
 
-  function decimals() override(IERC20) view external returns (uint8 tokenDecimals) {
-    tokenDecimals = _decimals();
+  function decimals() override(IERC20UFragments) pure external returns (uint8 tokenDecimals) {
+    tokenDecimals = _getScaledDecimals();
   }
 
-  function totalSupply() override(IERC20) external view returns (uint256 supply) {
-    supply = _totalSupply();
+  function totalSupply() override(IERC20UFragments) external view returns (uint256 supply) {
+    supply = _totalSupply(type(IERC20).interfaceId);
   }
 
-  function balanceOf(address account) external view override(IERC20) returns (uint256 balance) {
-    balance = _balanceOf(account) / _getBaseAmountPerFragment();
+  function balanceOf(address account) external view override(IERC20UFragments) returns (uint256 balance) {
+    balance = _balanceOf(type(IERC20).interfaceId, account) / _getBaseAmountPerFragment(type(IERC20UFragments).interfaceId);
   }
 
   function scaledBalanceOf(address account) external view returns (uint256 scaledBalance) {
-    scaledBalance = _balanceOf(account);
+    scaledBalance = _balanceOf(type(IERC20).interfaceId, account);
   }
 
   function transfer(address recipient, uint256 amount)
-    external override(IERC20) returns (bool result)
+    external override(IERC20UFragments) returns (bool result)
   {
-    uint256 scaledAmount = amount * _getBaseAmountPerFragment();
+    uint256 scaledAmount = amount * _getBaseAmountPerFragment(type(IERC20UFragments).interfaceId);
 
-    _transfer(msg.sender, recipient, scaledAmount);
+    _transfer(type(IERC20).interfaceId, msg.sender, recipient, scaledAmount);
     emit Transfer(msg.sender, recipient, amount);
     result = true;
   }
@@ -55,9 +56,9 @@ contract ERC20UFragments
     address account,
     address recipient,
     uint256 amount
-  ) external override(IERC20) returns (bool success) {
-    uint256 scaledAmount = amount * _getBaseAmountPerFragment();
-    _transferFrom(account, recipient, scaledAmount);
+  ) external override(IERC20UFragments) returns (bool success) {
+    uint256 scaledAmount = amount * _getBaseAmountPerFragment(type(IERC20UFragments).interfaceId);
+    _transferFrom(type(IERC20).interfaceId, account, recipient, scaledAmount);
     emit Transfer(account, recipient, amount);
     success = true;
   }
@@ -65,17 +66,17 @@ contract ERC20UFragments
   function allowance(
     address holder,
     address spender
-  ) override(IERC20) external view returns (uint256 limit) {
+  ) override(IERC20UFragments) external view returns (uint256 limit) {
 
-    limit = _allowance(holder, spender) / _getBaseAmountPerFragment();
+    limit = _allowance(type(IERC20).interfaceId, holder, spender) / _getBaseAmountPerFragment(type(IERC20UFragments).interfaceId);
   }
 
   function approve(
     address spender,
     uint256 amount
-  ) override(IERC20) external returns (bool success) {
-    uint256 scaledAmount = amount * _getBaseAmountPerFragment();
-    _approve(spender, scaledAmount);
+  ) override(IERC20UFragments) external returns (bool success) {
+    uint256 scaledAmount = amount * _getBaseAmountPerFragment(type(IERC20UFragments).interfaceId);
+    _approve(type(IERC20).interfaceId, spender, scaledAmount);
     emit Approval(msg.sender, spender, amount);
     success = true;
   }
@@ -96,39 +97,51 @@ contract ERC20UFragments
   function initialize(
     string memory newName,
     string memory newSymbol
-  ) external {
-    _setName(newName);
-    _setSymbol(newSymbol);
-    _setDecimals(DECIMALS);
+  ) external {_setName(
+      type(IERC20).interfaceId,
+      newName
+    );
+    _setSymbol(
+      type(IERC20).interfaceId,
+      newSymbol
+    );
+    _setDecimals(
+      type(IERC20).interfaceId,
+      DECIMALS
+    );
 
-    _setTotalSupply(INITIAL_FRAGMENTS_SUPPLY);
-    _setBalance(msg.sender, TOTAL_GONS);
-    _setBaseAmountPerFragment(TOTAL_GONS / _getTotalSupply() );
+    _setTotalSupply(type(IERC20).interfaceId, INITIAL_FRAGMENTS_SUPPLY);
+    _setBalance(type(IERC20).interfaceId, msg.sender, TOTAL_GONS);
+    _setBaseAmountPerFragment(
+      type(IERC20UFragments).interfaceId,
+      TOTAL_GONS / _getTotalSupply(type(IERC20).interfaceId) );
 
-    emit Transfer(address(0), msg.sender, _getTotalSupply() );
+    emit Transfer(address(0), msg.sender, _getTotalSupply(type(IERC20).interfaceId) );
   }
 
   function rebase(
     int256 supplyDelta
   ) external returns (uint256)
   {
-    uint256 currentTotalSupply = _totalSupply();
+    uint256 currentTotalSupply = _totalSupply(type(IERC20).interfaceId);
     if (supplyDelta == 0) {
       emit LogRebase(currentTotalSupply);
       return currentTotalSupply;
     }
 
     if (supplyDelta < 0) {
-      _setTotalSupply( currentTotalSupply - uint256(supplyDelta.abs() ) );
+      _setTotalSupply(type(IERC20).interfaceId,  currentTotalSupply - uint256(supplyDelta.abs() ) );
     } else {
-      _setTotalSupply(currentTotalSupply + uint256(supplyDelta) );
+      _setTotalSupply(type(IERC20).interfaceId, currentTotalSupply + uint256(supplyDelta) );
     }
 
     if (currentTotalSupply > MAX_SUPPLY) {
-      _setTotalSupply(MAX_SUPPLY);
+      _setTotalSupply(type(IERC20).interfaceId, MAX_SUPPLY);
     }
 
-    _setBaseAmountPerFragment(TOTAL_GONS / _totalSupply() );
+    _setBaseAmountPerFragment(
+      type(IERC20UFragments).interfaceId,
+      TOTAL_GONS / _totalSupply(type(IERC20).interfaceId) );
 
     // From this point forward, _gonsPerFragment is taken as the source of truth.
     // We recalculate a new _totalSupply to be in agreement with the _gonsPerFragment
@@ -141,8 +154,8 @@ contract ERC20UFragments
     // ever increased, it must be re-included.
     // _totalSupply = TOTAL_GONS.div(_gonsPerFragment)
 
-    emit LogRebase(_totalSupply() );
-    return _totalSupply();
+    emit LogRebase(_totalSupply(type(IERC20).interfaceId) );
+    return _totalSupply(type(IERC20).interfaceId);
   }
 
 }

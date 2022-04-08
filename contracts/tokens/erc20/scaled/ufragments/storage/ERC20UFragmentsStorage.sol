@@ -12,10 +12,6 @@ library ERC20UFragmentsStorage {
     UInt256.Layout baseAmountPerFragment;
   }
 
-  // function _layout(bytes32 slot) pure internal returns ( Layout storage layout ) {
-  //   assembly{ layout.slot := slot }
-  // }
-
 }
 
 library ERC20UFragmentsUtils {

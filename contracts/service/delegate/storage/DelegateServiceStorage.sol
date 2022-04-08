@@ -18,13 +18,6 @@ library DelegateServiceStorage {
     Bytes4Set.Layout functionSelectors;
   }
 
-  function _layout(bytes32 salt) pure internal returns (Layout storage layout) {
-    bytes32 saltedSlot = salt
-      ^ Bytes4Utils._structSlot()
-      ^ Bytes4SetUtils._structSlot();
-    assembly{ layout.slot := saltedSlot }
-  }
-
 }
 
 library DelegateServiceStorageUtils {
@@ -37,8 +30,12 @@ library DelegateServiceStorageUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
-  function _layout( bytes32 slot ) pure internal returns ( DelegateServiceStorage.Layout storage layout ) {
-    layout = DelegateServiceStorage._layout(slot);
+  function _layout( bytes32 salt ) pure internal returns ( DelegateServiceStorage.Layout storage layout ) {
+    bytes32 saltedSlot = salt
+      ^ DelegateServiceStorageUtils._structSlot()
+      ^ Bytes4Utils._structSlot()
+      ^ Bytes4SetUtils._structSlot();
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _setServiceDef(
@@ -52,9 +49,14 @@ library DelegateServiceStorageUtils {
     }
   }
 
-  function _getServiceDef(DelegateServiceStorage.Layout storage layout) view internal returns (IDelegateService.ServiceDef memory serviceDef) {
-    serviceDef.interfaceId = layout.interfaceId.value;
-    serviceDef.functionSelectors = layout.functionSelectors.set._setAsArray();
+  function _getServiceDef(
+    DelegateServiceStorage.Layout storage layout
+  ) view internal returns (
+    bytes4 interfaceId,
+    bytes4[] memory functionSelectors
+  ) {
+    interfaceId = layout.interfaceId.value;
+    functionSelectors = layout.functionSelectors.set._setAsArray();
   }
 
 }

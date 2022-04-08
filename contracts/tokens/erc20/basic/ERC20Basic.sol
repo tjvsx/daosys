@@ -13,44 +13,53 @@ contract ERC20Basic is IERC20, ERC20Account, ERC20Metadata {
     uint8 newDecimals,
     uint256 supply
   ) {
-    _setName(newName);
-    _setSymbol(newSymbol);
-    _setDecimals(newDecimals);
-    _mint(msg.sender,supply);
+    _setName(
+      type(IERC20).interfaceId,
+      newName
+    );
+    _setSymbol(
+      type(IERC20).interfaceId,
+      newSymbol
+    );
+    _setDecimals(
+      type(IERC20).interfaceId,
+      newDecimals
+    );
+    _mint(type(IERC20).interfaceId, msg.sender,supply);
   }
 
   function name() override(IERC20) view external returns (string memory tokenName) {
-    tokenName = _name();
+    tokenName = _name(type(IERC20).interfaceId);
   }
 
   function symbol() override(IERC20) view external returns (string memory tokenSymbol) {
-    tokenSymbol = _symbol();
+    tokenSymbol = _symbol(type(IERC20).interfaceId);
   }
 
   function decimals() override(IERC20) view external returns (uint8 tokenDecimals) {
-    tokenDecimals = _decimals();
+    tokenDecimals = _decimals(type(IERC20).interfaceId);
   }
   
   function totalSupply() override(IERC20) external view returns (uint256 supply) {
-    supply = _totalSupply();
+    supply = _totalSupply(type(IERC20).interfaceId);
   }
 
   function balanceOf(address account) override(IERC20) external view returns (uint256 balance) {
-    balance = _balanceOf(account);
+    balance = _balanceOf(type(IERC20).interfaceId, account);
   }
 
   function allowance(
     address holder,
     address spender
   ) override(IERC20) external view returns (uint256 limit) {
-    limit = _allowance(holder, spender);
+    limit = _allowance(type(IERC20).interfaceId, holder, spender);
   }
 
   function approve(
     address spender,
     uint256 amount
   ) override(IERC20) external returns (bool success) {
-    _approve(spender, amount);
+    _approve(type(IERC20).interfaceId, spender, amount);
     emit Approval(msg.sender, spender, amount);
     success = true;
   }
@@ -59,7 +68,7 @@ contract ERC20Basic is IERC20, ERC20Account, ERC20Metadata {
     address recipient, 
     uint256 amount
   ) override(IERC20) external returns (bool success) {
-    _transfer(msg.sender, recipient, amount);
+    _transfer(type(IERC20).interfaceId, msg.sender, recipient, amount);
     emit Transfer(msg.sender, recipient, amount);
     success = true;
   }
@@ -69,7 +78,7 @@ contract ERC20Basic is IERC20, ERC20Account, ERC20Metadata {
     address recipient,
     uint256 amount
   ) override(IERC20) external returns (bool success) {
-    _transferFrom(account, recipient, amount);
+    _transferFrom(type(IERC20).interfaceId, account, recipient, amount);
     emit Transfer(account, recipient, amount);
     success = true;
   }

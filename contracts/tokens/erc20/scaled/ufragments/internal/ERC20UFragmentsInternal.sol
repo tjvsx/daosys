@@ -14,28 +14,30 @@ abstract contract ERC20UFragmentsInternal {
 
   // uint256 private constant MAX_UINT256 = type(uint256).max;
 
-  function _getDefaultSlot() pure internal returns (bytes32 defaultSlot) {
-    defaultSlot = STORAGE_SLOT;
-  }
+  // function _getDefaultSlot() pure internal returns (bytes32 defaultSlot) {
+  //   defaultSlot = STORAGE_SLOT;
+  // }
 
-  function _layout(bytes32 slot) pure internal returns (ERC20UFragmentsStorage.Layout storage layout) {
-    layout = ERC20UFragmentsUtils._layout(slot);
-  }
+  // function _layout(bytes32 slot) pure internal returns (ERC20UFragmentsStorage.Layout storage layout) {
+  //   layout = ERC20UFragmentsUtils._layout(slot);
+  // }
 
-  function _getSacledDecimals() pure internal returns (uint8 scaledDecimals) {
+  function _getScaledDecimals() pure internal returns (uint8 scaledDecimals) {
     scaledDecimals = ERC20UFragmentsUtils._getScaledDecimals();
   }
 
   function _getBaseAmountPerFragment(
+    bytes32 storageSlotSalt
   ) view internal returns (uint256 baseAmountPerFragment) {
-    baseAmountPerFragment = ERC20UFragmentsUtils._layout(ERC20UFragmentsUtils._structSlot())
+    baseAmountPerFragment = ERC20UFragmentsUtils._layout(storageSlotSalt)
       ._getBaseAmountPerFragment();
   }
 
   function _setBaseAmountPerFragment(
+    bytes32 storageSlotSalt,
     uint256 newBaseAmountPerFragment
   ) internal {
-    ERC20UFragmentsUtils._layout(ERC20UFragmentsUtils._structSlot())
+    ERC20UFragmentsUtils._layout(storageSlotSalt)
       ._setBaseAmountPerFragment(newBaseAmountPerFragment);
   }
 

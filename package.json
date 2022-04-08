@@ -6,15 +6,16 @@
   "repository": "git@github.com:syscoin/daosys.git",
   "author": "cyotee doge <cyotee@syscoin.org>",
   "license": "AGPL-3.0-or-later",
-  "private": true,
+  "private": false,
   "scripts": {
-    "coverage": "yarn run hardhat coverage",
-    "build": "yarn run hardhat compile && lerna run tsc",
-    "clean-build": "yarn run hardhat clean && yarn run hardhat compile && yarn run hardhat test --logs",
     "clean": "yarn run hardhat clean",
     "compile": "yarn run hardhat compile",
     "typechain": "yarn run hardhat typechain",
-    "test": "yarn run hardhat compile && yarn run hardhat test"
+    "test": "yarn run hardhat compile && yarn run hardhat test",
+    "clean-build": "yarn run hardhat clean && yarn run hardhat compile && yarn run hardhat test --logs",
+    "full-build": "yarn run hardhat clean && yarn run hardhat compile && yarn run hardhat test --logs && yarn docs",
+    "coverage": "yarn run hardhat coverage",
+    "docs": "asciidoctor-reducer --preserve-conditionals -o README.adoc readme-template.adoc"
   },
   "devDependencies": {
     "@asciidoctor/core": "^2.2.6",
@@ -60,6 +61,7 @@
     "solc": "0.8.9",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17",
+    "solidity-docgen": "^0.6.0-beta.8",
     "stochasm": "^0.5.0",
     "ts-node": "^10.4.0",
     "typechain": "^7.0.0",
