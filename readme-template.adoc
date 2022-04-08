@@ -13,4 +13,4 @@
 :imagesdir: ./
 :compositing:
 
-include::docs/architecture/daosys-architecture.adoc[leveloffset=+1]
+include::docs/daosys/daosys-litepaper.adoc[leveloffset=+1]

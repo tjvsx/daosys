@@ -9,6 +9,7 @@ daosys
 datatypes
 DELEGATECALL
 GONS
+litepaper
 permissionless
 reimplementation
 Roundtable
