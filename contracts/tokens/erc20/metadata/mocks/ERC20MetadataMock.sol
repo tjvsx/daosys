@@ -4,28 +4,38 @@ pragma solidity ^0.8.0;
 import {
   ERC20Metadata,
   ERC20MetadataInternal,
-  ERC20MetadataLib,
+  ERC20MetadataUtils,
   ERC20MetadataStorage
 } from "../ERC20Metadata.sol";
+import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
 
 contract ERC20MetadataMock is ERC20Metadata {
 
   function setName(
     string memory tokenName
   ) external {
-    _setName(tokenName);
+    _setName(
+      type(IERC20).interfaceId,
+      tokenName
+    );
   }
 
   function setSymbol(
     string memory newSymbol
   ) external {
-    _setSymbol(newSymbol);
+    _setSymbol(
+      type(IERC20).interfaceId,
+      newSymbol
+    );
   }
 
   function setDecimals(
     uint8 newDecimals
   ) external {
-    _setDecimals(newDecimals);
+    _setDecimals(
+      type(IERC20).interfaceId,
+      newDecimals
+    );
   }
 
   function name() view external returns (string memory tokenName) {

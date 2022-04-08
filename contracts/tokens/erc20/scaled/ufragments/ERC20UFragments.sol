@@ -97,10 +97,18 @@ contract ERC20UFragments
   function initialize(
     string memory newName,
     string memory newSymbol
-  ) external {
-    _setName(newName);
-    _setSymbol(newSymbol);
-    _setDecimals(DECIMALS);
+  ) external {_setName(
+      type(IERC20UFragments).interfaceId,
+      newName
+    );
+    _setSymbol(
+      type(IERC20UFragments).interfaceId,
+      newSymbol
+    );
+    _setDecimals(
+      type(IERC20UFragments).interfaceId,
+      DECIMALS
+    );
 
     _setTotalSupply(INITIAL_FRAGMENTS_SUPPLY);
     _setBalance(msg.sender, TOTAL_GONS);

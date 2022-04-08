@@ -13,9 +13,18 @@ contract ERC20Basic is IERC20, ERC20Account, ERC20Metadata {
     uint8 newDecimals,
     uint256 supply
   ) {
-    _setName(newName);
-    _setSymbol(newSymbol);
-    _setDecimals(newDecimals);
+    _setName(
+      type(IERC20).interfaceId,
+      newName
+    );
+    _setSymbol(
+      type(IERC20).interfaceId,
+      newSymbol
+    );
+    _setDecimals(
+      type(IERC20).interfaceId,
+      newDecimals
+    );
     _mint(msg.sender,supply);
   }
 
