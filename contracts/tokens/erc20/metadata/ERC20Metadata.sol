@@ -10,16 +10,16 @@ import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
 
 abstract contract ERC20Metadata is ERC20MetadataInternal {
 
-  function _name() view internal returns (string memory tokenName) {
-    tokenName = _getName(type(IERC20).interfaceId);
+  function _name(bytes32 storageSlotSalt) view internal returns (string memory tokenName) {
+    tokenName = _getName(storageSlotSalt);
   }
 
-  function _symbol() view internal returns (string memory tokenSymbol) {
-    tokenSymbol = _getSymbol(type(IERC20).interfaceId);
+  function _symbol(bytes32 storageSlotSalt) view internal returns (string memory tokenSymbol) {
+    tokenSymbol = _getSymbol(storageSlotSalt);
   }
 
-  function _decimals() view internal returns (uint8 tokenDecimals) {
-    tokenDecimals = _getDecimals(type(IERC20).interfaceId);
+  function _decimals(bytes32 storageSlotSalt) view internal returns (uint8 tokenDecimals) {
+    tokenDecimals = _getDecimals(storageSlotSalt);
   }
   
 }

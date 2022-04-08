@@ -39,15 +39,15 @@ contract ERC20MetadataMock is ERC20Metadata {
   }
 
   function name() view external returns (string memory tokenName) {
-    tokenName = _name();
+    tokenName = _name(type(IERC20).interfaceId);
   }
 
   function symbol() view external returns (string memory tokenSymbol) {
-    tokenSymbol = _symbol();
+    tokenSymbol = _symbol(type(IERC20).interfaceId);
   }
 
   function decimals() view external returns (uint8 tokenDecimals) {
-    tokenDecimals = _decimals();
+    tokenDecimals = _decimals(type(IERC20).interfaceId);
   }
 
 }
