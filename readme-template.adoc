@@ -14,3 +14,5 @@
 :compositing:
 
 include::docs/daosys/daosys-litepaper.adoc[leveloffset=+1]
+
+include::docs/architecture/daosys-architecture.adoc[leveloffset=+1]
