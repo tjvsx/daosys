@@ -1,6 +1,6 @@
 import numpy as np
 
-L_FACTOR = 3
+L_FACTOR = 2
 N_SAMP = 10000
 
 class PriceCurve():
