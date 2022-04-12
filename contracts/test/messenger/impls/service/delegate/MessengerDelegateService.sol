@@ -3,8 +3,7 @@ pragma solidity ^0.8.0;
 
 import {
   DelegateService,
-  IDelegateService,
-  DelegateServiceInternal
+  IDelegateService
 } from "contracts/service/delegate/DelegateService.sol";
 import {
   Messenger,
@@ -27,6 +26,14 @@ contract MessengerDelegateService
       address(0),
       bytes4(0)
     );
+  }
+
+  function IDelegateServiceInterfaceId() pure external returns (bytes4 interfaceId) {
+    interfaceId = type(IDelegateService).interfaceId;
+  }
+
+  function getServiceDefFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IDelegateService.getServiceDef.selector;
   }
   
 }

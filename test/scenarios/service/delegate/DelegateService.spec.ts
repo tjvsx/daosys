@@ -9,7 +9,7 @@ import {
   DelegateServiceMock__factory
 } from '../../../../typechain';
 
-describe("Messenger", function () {
+describe("Delegate Service", function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
@@ -49,7 +49,7 @@ describe("Messenger", function () {
     tracer.nameTags[deployer.address] = "Deployer";
 
     delegateServiceMock = await new DelegateServiceMock__factory(deployer).deploy();
-    tracer.nameTags[delegateServiceMock.address] = "Messenger Delegate Service";
+    tracer.nameTags[delegateServiceMock.address] = "Delegate Service Mock";
 
   });
 
