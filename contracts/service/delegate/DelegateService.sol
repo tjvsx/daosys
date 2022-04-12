@@ -12,20 +12,28 @@ abstract contract DelegateService is IDelegateService, DelegateServiceInternal {
 
   using DelegateServiceStorageUtils for DelegateServiceStorage.Layout;
 
-  function setServiceDef(
+  function _setServiceDef(
     bytes4 interfaceId,
-    bytes4[] memory functionSelectors
-  ) external {
+    bytes4[] memory functionSelectors,
+    address bootstrapper,
+    bytes4 bootstrapperInitFunction
+  ) internal {
     _setServiceDef(
       type(IDelegateService).interfaceId,
       interfaceId,
-      functionSelectors
+      functionSelectors,
+        bootstrapper,
+        bootstrapperInitFunction
     );
   }
 
   function getServiceDef() view external returns (ServiceDef memory serviceDef) {
-    (serviceDef.interfaceId, serviceDef.functionSelectors) = DelegateServiceStorageUtils
-      ._layout(type(IDelegateService).interfaceId)
+    (
+      serviceDef.interfaceId,
+      serviceDef.functionSelectors,
+      serviceDef.bootstrapper,
+      serviceDef.bootstrapperInitFunction
+    ) = DelegateServiceStorageUtils._layout(type(IDelegateService).interfaceId)
       ._getServiceDef();
   }
 

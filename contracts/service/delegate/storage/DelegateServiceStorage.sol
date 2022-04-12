@@ -9,6 +9,10 @@ import {
   Bytes4Set,
   Bytes4SetUtils
 } from "contracts/types/collections/sets/Bytes4Set.sol";
+import {
+  Address,
+  AddressUtils
+} from "contracts/types/primitives/Address.sol";
 import {IDelegateService} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
 library DelegateServiceStorage {
@@ -16,13 +20,17 @@ library DelegateServiceStorage {
   struct Layout {
     Bytes4.Layout interfaceId;
     Bytes4Set.Layout functionSelectors;
+    Address.Layout bootstrapper;
+    Bytes4.Layout bootStrapperInitFunction;
   }
 
 }
 
 library DelegateServiceStorageUtils {
 
+  using Bytes4Utils for Bytes4.Layout;
   using Bytes4SetUtils for Bytes4Set.Enumerable;
+  using AddressUtils for Address.Layout;
 
   bytes32 constant internal STRUCT_STORAGE_SLOT = keccak256(type(DelegateServiceStorage).creationCode);
 
@@ -34,16 +42,21 @@ library DelegateServiceStorageUtils {
     bytes32 saltedSlot = salt
       ^ DelegateServiceStorageUtils._structSlot()
       ^ Bytes4Utils._structSlot()
-      ^ Bytes4SetUtils._structSlot();
+      ^ Bytes4SetUtils._structSlot()
+      ^ AddressUtils._structSlot();
     assembly{ layout.slot := saltedSlot }
   }
 
   function _setServiceDef(
     DelegateServiceStorage.Layout storage layout,
     bytes4 interfaceId,
-    bytes4[] memory functionSelectors
+    bytes4[] memory functionSelectors,
+    address bootstrapper,
+    bytes4 bootStrapperInitFunction
   ) internal {
-    layout.interfaceId.value = interfaceId;
+    layout.interfaceId._setValue(interfaceId);
+    layout.bootstrapper._setValue(bootstrapper);
+    layout.bootStrapperInitFunction._setValue(bootStrapperInitFunction);
     for(uint16 iteration = 0; functionSelectors.length > iteration; iteration++) {
       layout.functionSelectors.set._add(functionSelectors[iteration]);
     }
@@ -53,10 +66,14 @@ library DelegateServiceStorageUtils {
     DelegateServiceStorage.Layout storage layout
   ) view internal returns (
     bytes4 interfaceId,
-    bytes4[] memory functionSelectors
+    bytes4[] memory functionSelectors,
+    address bootstrapper,
+    bytes4 bootStrapperInitFunction
   ) {
-    interfaceId = layout.interfaceId.value;
-    functionSelectors = layout.functionSelectors.set._setAsArray();
+    interfaceId = layout.interfaceId._getValue();
+    functionSelectors = layout.functionSelectors.set._getSetAsArray();
+    bootstrapper = layout.bootstrapper._getValue();
+    bootStrapperInitFunction = layout.bootStrapperInitFunction._getValue();
   }
 
 }

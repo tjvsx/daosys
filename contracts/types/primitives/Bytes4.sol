@@ -41,6 +41,19 @@ library Bytes4Utils {
       ^ Bytes4Utils._structSlot();
     assembly{ layout.slot := saltedSlot }
   }
+  
+  function _setValue(
+    Bytes4.Layout storage layout,
+    bytes4 newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    Bytes4.Layout storage layout
+  ) view internal returns (bytes4 value) {
+    value = layout.value;
+  }
 
 }
 /* -------------------------------------------------------------------------- */

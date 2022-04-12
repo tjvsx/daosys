@@ -6,7 +6,10 @@ interface IDelegateService {
   struct ServiceDef{
     bytes4 interfaceId;
     bytes4[] functionSelectors;
+    address bootstrapper;
+    bytes4 bootstrapperInitFunction;
   }
 
   function getServiceDef() view external returns (ServiceDef memory serviceDef);
+  
 }

@@ -18,6 +18,15 @@ contract MessengerDelegateService
 {
 
   constructor() {
-    _setServiceDef
+    bytes4[] memory functionSelectors = new bytes4[](2);
+    functionSelectors[0] = IMessenger.setMessage.selector;
+    functionSelectors[1] = IMessenger.getMessage.selector;
+    DelegateService._setServiceDef(
+      type(IMessenger).interfaceId,
+      functionSelectors,
+      address(0),
+      bytes4(0)
+    );
   }
+  
 }
