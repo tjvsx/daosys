@@ -13,6 +13,7 @@ describe("Messenger", function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
+  const Bytes4Zero = "0x00000000";
 
   // Test Wallets
   let deployer: SignerWithAddress;
@@ -85,7 +86,7 @@ describe("Messenger", function () {
             ]
           );
           expect(serviceDef.bootstrapper).to.equal(ethers.constants.AddressZero);
-          expect(serviceDef.bootstrapperInitFunction).to.equal('0x00000000');
+          expect(serviceDef.bootstrapperInitFunction).to.equal(Bytes4Zero);
         });
       });
     });
