@@ -1,4 +1,4 @@
-# Based on Uniswap v1 and v2 (see Reference 1); for Uniswap v3 see reference 3
+# Based on Uniswap v1 and v2 (see Reference 1); for Uniswap v3 see reference 2
 
 # References: 
 
@@ -30,13 +30,14 @@ class Liquidity():
 
     def calc_delta_x(self, delta_y):
         return (self.__x_real*delta_y)/(self.__y_real+delta_y)
-   
+  
+    def calc(self):    
+        return np.sqrt(self.__x_real*self.__y_real)    
+         
+    def update(self, delta_x):
         
-    def calc(self, delta_x = None):
-        
-        if(delta_x != None):
-            delta_y = self.calc_delta_y(delta_x)
-            self.__x_real = (self.__x_real+delta_x)
-            self.__y_real = (self.__y_real-delta_y)
+        delta_y = self.calc_delta_y(delta_x)
+        self.__x_real = (self.__x_real+delta_x)
+        self.__y_real = (self.__y_real-delta_y)
             
         return np.sqrt(self.__x_real*self.__y_real)

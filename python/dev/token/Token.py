@@ -19,9 +19,6 @@ class Token():
     
     def get_supply(self):
         return self.__supply    
-    
-    def get_rate(self):
-        return self.__native_rate    
       
     def get_name(self):
         return self.__tname       
@@ -38,9 +35,17 @@ class Token():
     def gen_address(self):
         return self.__addresses.gen_key()
     
-    def get_balance_deposits(self):
-        deposits = self.__addresses.get_balances()
-        return sum(list(deposits.values()))
+    def get_balance(self, user_address):
+        return self.__addresses.get_balance(user_address)    
+    
+    def get_balance_deposits(self, addresses = None):
+        if(addresses == None):
+            deposits = self.__addresses.get_balances()
+            deposits = list(deposits.values())
+        else:
+            deposits = [self.__addresses.get_balance(addr) for addr in addresses] 
+            
+        return sum(deposits)
     
     def deposit(self, delta, address):
         
