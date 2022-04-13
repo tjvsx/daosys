@@ -31,4 +31,19 @@ library Bytes4ToAddressUtils {
     assembly{ layout.slot := saltedSlot }
   }
 
+  function _mapValue(
+    Bytes4ToAddress.Layout storage layout,
+    bytes4 key,
+    address newValue
+  ) internal {
+    layout.value[key] = newValue;
+  }
+
+  function _queryValue(
+    Bytes4ToAddress.Layout storage layout,
+    bytes4 key
+  ) view internal returns (address value) {
+    value = layout.value[key];
+  }
+
 }

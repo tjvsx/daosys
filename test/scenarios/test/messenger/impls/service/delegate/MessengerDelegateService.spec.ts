@@ -63,7 +63,7 @@ describe("Messenger Delegate Service", function () {
   /*                          SECTION Testing Messenger                         */
   /* -------------------------------------------------------------------------- */
 
-  describe("DelegateService", function () {
+  describe("MessengerDelegateService", function () {
 
     describe("Messenger", function () {
 

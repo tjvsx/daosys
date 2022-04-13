@@ -5,8 +5,8 @@ import {
 import { expect } from "chai";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
-  Messenger,
-  Messenger__factory
+  MessengerMock,
+  MessengerMock__factory
 } from '../../../../typechain';
 
 describe("Messenger", function () {
@@ -18,7 +18,7 @@ describe("Messenger", function () {
   let deployer: SignerWithAddress;
 
   // TestService test variables
-  let messenger: Messenger;
+  let messenger: MessengerMock;
 
   // const erc165InterfaceID = "0x01ffc9a7";
   const IMessengerInterfaceId = "0xf8e6c6ac";
@@ -48,7 +48,7 @@ describe("Messenger", function () {
     ] = await ethers.getSigners();
     tracer.nameTags[deployer.address] = "Deployer";
 
-    messenger = await new Messenger__factory(deployer).deploy();
+    messenger = await new MessengerMock__factory(deployer).deploy();
     tracer.nameTags[messenger.address] = "Messenger";
 
   });

@@ -2,13 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {
-  DelegateServiceInternal,
+  DelegateServiceLogic,
   DelegateServiceStorage,
   DelegateServiceStorageUtils
-} from "contracts/service/delegate/internal/DelegateServiceInternal.sol";
+} from "contracts/service/delegate/logic/DelegateServiceLogic.sol";
 import {IDelegateService} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
-abstract contract DelegateService is IDelegateService, DelegateServiceInternal {
+abstract contract DelegateService is IDelegateService, DelegateServiceLogic {
 
   using DelegateServiceStorageUtils for DelegateServiceStorage.Layout;
 
