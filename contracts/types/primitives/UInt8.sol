@@ -40,6 +40,20 @@ library UInt8Utils {
     assembly{ layout.slot := saltedSlot }
   }
 
+  function _setValue(
+    UInt8.Layout storage layout,
+    uint8 newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    UInt8.Layout storage layout
+  ) view internal returns (uint8 value) {
+    value = layout.value;
+  }
+
+
 }
 
 /* -------------------------------------------------------------------------- */

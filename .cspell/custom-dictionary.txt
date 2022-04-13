@@ -3,6 +3,7 @@ Aavegotchi
 Affero
 antifragile
 asciimath
+bootstrapper
 copyleft
 copyrightable
 daosys

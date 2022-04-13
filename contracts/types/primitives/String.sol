@@ -41,6 +41,19 @@ library StringUtils {
       ^ StringUtils._structSlot();
     assembly{ layout.slot := saltedSlot }
   }
+  
+  function _setValue(
+    String.Layout storage layout,
+    string memory newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    String.Layout storage layout
+  ) view internal returns (string memory value) {
+    value = layout.value;
+  }
 
 }
 /* -------------------------------------------------------------------------- */

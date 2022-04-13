@@ -63,6 +63,19 @@ library AddressUtils {
     assembly { size := extcodesize(account) }
     return size > 0;
   }
+  
+  function _setValue(
+    Address.Layout storage layout,
+    address newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    Address.Layout storage layout
+  ) view internal returns (address value) {
+    value = layout.value;
+  }
 
   function _sendValue(address payable account, uint amount) internal {
     (bool success, ) = account.call{ value: amount }('');

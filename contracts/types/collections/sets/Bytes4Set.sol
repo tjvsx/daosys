@@ -123,7 +123,7 @@ library Bytes4SetUtils {
     }
   }
 
-  function _setAsArray( Bytes4Set.Enumerable storage set ) internal view returns ( bytes4[] storage rawSet ) {
+  function _getSetAsArray( Bytes4Set.Enumerable storage set ) internal view returns ( bytes4[] storage rawSet ) {
     rawSet = set._values;
   }
 

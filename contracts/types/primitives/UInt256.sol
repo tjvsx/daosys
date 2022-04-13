@@ -40,6 +40,19 @@ library UInt256Utils {
     assembly{ layout.slot := saltedSlot }
   }
 
+  function _setValue(
+    UInt256.Layout storage layout,
+    uint256 newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    UInt256.Layout storage layout
+  ) view internal returns (uint256 value) {
+    value = layout.value;
+  }
+
 }
 
 /* -------------------------------------------------------------------------- */
