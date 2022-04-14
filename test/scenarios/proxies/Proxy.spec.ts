@@ -5,11 +5,13 @@ import {
 import { expect } from "chai";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
-  MessengerMock,
-  MessengerMock__factory
-} from '../../../../typechain';
+  Messenger,
+  Messenger__factory,
+  ProxyMock,
+  ProxyMock__factory
+} from '../../../typechain';
 
-describe("Messenger", function () {
+describe("Proxy", function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
@@ -18,15 +20,12 @@ describe("Messenger", function () {
   let deployer: SignerWithAddress;
 
   // TestService test variables
-  let messenger: MessengerMock;
-
-  // const erc165InterfaceID = "0x01ffc9a7";
-  const IMessengerInterfaceId = "0xf8e6c6ac";
-  const setMessageFunctionSelector = '0x368b8772';
-  const getMessageFunctionSelector = '0xce6d41de';
+  let messenger: Messenger;
+  let proxy: ProxyMock;
+  let proxyAsMessenger: Messenger;
 
   /* -------------------------------------------------------------------------- */
-  /*                        SECTION Before All Test Hook                        */
+  /*                  SECTION ServiceProxy Before All Test Hook                 */
   /* -------------------------------------------------------------------------- */
 
   before(async function () {
@@ -35,12 +34,13 @@ describe("Messenger", function () {
   })
 
   /* -------------------------------------------------------------------------- */
-  /*                       !SECTION Before All Test Hook                        */
+  /*                 !SECTION ServiceProxy Before All Test Hook                 */
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------------------------------------------------------- */
-  /*                        SECTION Before Each Test Hook                       */
+  /*                 SECTION ServiceProxy Before Each Test Hook                 */
   /* -------------------------------------------------------------------------- */
+
   beforeEach(async function () {
 
     [
@@ -48,36 +48,26 @@ describe("Messenger", function () {
     ] = await ethers.getSigners();
     tracer.nameTags[deployer.address] = "Deployer";
 
-    messenger = await new MessengerMock__factory(deployer).deploy();
+    messenger = await new Messenger__factory(deployer).deploy();
     tracer.nameTags[messenger.address] = "Messenger";
+
+    proxy = await new ProxyMock__factory(deployer).deploy(messenger.address);
+    tracer.nameTags[proxy.address] = "Proxy";
+
+    proxyAsMessenger = await ethers.getContractAt("Messenger", proxy.address) as Messenger;
+    tracer.nameTags[proxyAsMessenger.address] = "MessengerProxy";
 
   });
 
   /* -------------------------------------------------------------------------- */
-  /*                       !SECTION Before Each Test Hook                       */
+  /*                 !SECTION ServiceProxy Before Each Test Hook                */
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------------------------------------------------------- */
-  /*                          SECTION Testing Messenger                         */
+  /*                        SECTION Testing ServiceProxy                        */
   /* -------------------------------------------------------------------------- */
 
   describe("Messenger", function () {
-
-    describe("Validate interface and function selector computation", function () {
-      it("IMessengerInterfaceId.", async function () {
-        expect(await messenger.IMessengerInterfaceId())
-          .to.equal(IMessengerInterfaceId);
-      });
-      it("setMessageFunctionSelector.", async function () {
-        expect(await messenger.setMessageFunctionSelector())
-          .to.equal(setMessageFunctionSelector);
-      });
-      it("getMessageFunctionSelector.", async function () {
-        expect(await messenger.getMessageFunctionSelector())
-          .to.equal(getMessageFunctionSelector);
-      });
-      
-    });
 
     describe("#getMessage()", function () {
       describe("()", function () {
@@ -90,8 +80,31 @@ describe("Messenger", function () {
 
   });
 
+  describe("Proxy", function () {
+
+    describe("queryForDelegateService()", function () {
+      it("Can set and get delegate service", async function () {
+        // expect(await proxy._getImplementation() ).to.equal(messenger.address);
+      });
+    });
+
+    describe("::Messenger", function () {
+
+      describe("#getMessage()", function () {
+        describe("()", function () {
+          it("Can set and get message", async function () {
+            await proxyAsMessenger.setMessage("Hello World!");
+            expect(await proxyAsMessenger.getMessage()).to.equal("Hello World!");
+          });
+        });
+      });
+
+    });
+
+  });
+
   /* -------------------------------------------------------------------------- */
-  /*                         !SECTION Testing Messenger                         */
+  /*                        !SECTION Testing ServiceProxy                       */
   /* -------------------------------------------------------------------------- */
 
 });

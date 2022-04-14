@@ -6,13 +6,13 @@ import {
   IDelegateService
 } from "contracts/service/delegate/DelegateService.sol";
 import {
-  Messenger,
+  MessengerMock,
   IMessenger
-} from "contracts/test/messenger/Messenger.sol";
+} from "contracts/test/messenger/mocks/MessengerMock.sol";
 
 contract MessengerDelegateService
   is
-  Messenger,
+  MessengerMock,
   DelegateService
 {
 

@@ -12,10 +12,38 @@ library MessengerStorage {
   struct Layout {
     String.Layout message;
   }
+  
+}
+
+library MessengerUtils {
+
+  using MessengerUtils for MessengerStorage.Layout;
+  using StringUtils for String.Layout;
+
+  bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(MessengerStorage).creationCode);
+
+  function _structSlot() pure internal returns (bytes32 structSlot) {
+    structSlot = STRUCT_STORAGE_SLOT;
+  }
 
   function _layout(bytes32 salt) pure internal returns (MessengerStorage.Layout storage layout) {
-    bytes32 saltedSlot = salt ^ StringUtils._structSlot();
+    bytes32 saltedSlot =
+      salt 
+      ^ MessengerUtils._structSlot()
+      ^ StringUtils._structSlot();
     assembly{ layout.slot := saltedSlot }
   }
-  
+
+  function _setMessage(
+    MessengerStorage.Layout storage layout,
+    string memory message
+  ) internal {
+    layout.message._setValue(message);
+  }
+
+  function _getMessage(
+    MessengerStorage.Layout storage layout
+  ) view internal returns (string memory message) {
+    message = layout.message._getValue();
+  }
 }

@@ -12,12 +12,12 @@ contract StringMock {
   using StringUtils for String.Layout;
 
   function setString(string memory newValue) external returns (bool result) {
-    StringUtils._layout(StringUtils._structSlot()).value = newValue;
+    StringUtils._layout(StringUtils._structSlot())._setValue(newValue);
     result = true;
   }
 
   function getString() view external returns (string memory value) {
-    value = StringUtils._layout(StringUtils._structSlot()).value;
+    value = StringUtils._layout(StringUtils._structSlot())._getValue();
   }
 
   function getStructSlot() pure external returns (bytes32 structSlot) {

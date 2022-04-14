@@ -6,7 +6,7 @@ import {
   DelegateServiceStorageUtils
 } from "contracts/service/delegate/storage/DelegateServiceStorage.sol";
 
-abstract contract DelegateServiceInternal {
+abstract contract DelegateServiceLogic {
 
   using DelegateServiceStorageUtils for DelegateServiceStorage.Layout;
 

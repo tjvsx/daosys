@@ -29,9 +29,9 @@ library UInt256Counter {
 library UInt256CounterUtils {
 
   using UInt256CounterUtils for UInt256Counter.Layout;
+  using UInt256Utils for UInt256.Layout;
 
-  bytes32 constant private STRUCT_STORAGE_SLOT = 
-    keccak256(type(UInt256Counter).creationCode);
+  bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(UInt256Counter).creationCode);
 
   function _structSlot() pure internal returns (bytes32 structSlot) {
     structSlot = STRUCT_STORAGE_SLOT
@@ -54,8 +54,8 @@ library UInt256CounterUtils {
   function _next(
     UInt256Counter.Layout storage layout
   ) internal returns (uint256 lastCount) {
-    lastCount = layout.count.value;
-    layout.count.value++;
+    lastCount = layout.count._getValue();
+    layout.count._setValue(++lastCount);
   }
 
 }

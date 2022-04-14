@@ -6,7 +6,6 @@
   "repository": "git@github.com:syscoin/daosys.git",
   "author": "cyotee doge <cyotee@syscoin.org>",
   "license": "AGPL-3.0-or-later",
-  "private": false,
   "scripts": {
     "clean": "yarn run hardhat clean",
     "compile": "yarn run hardhat compile",
