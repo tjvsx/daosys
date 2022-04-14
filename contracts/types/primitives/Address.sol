@@ -42,6 +42,25 @@ library AddressUtils {
     assembly{ layout.slot := saltedSlot }
   }
 
+  function _setValue(
+    Address.Layout storage layout,
+    address newValue
+  ) internal {
+    layout.value = newValue;
+  }
+
+  function _getValue(
+    Address.Layout storage layout
+  ) view internal returns (address value) {
+    value = layout.value;
+  }
+
+  function _wipeValue(
+    Address.Layout storage layout
+  ) internal {
+    delete layout.value;
+  }
+
   function _toString(address account) internal pure returns (string memory) {
     bytes32 value = bytes32(uint256(uint160(account)));
     bytes memory alphabet = '0123456789abcdef';
@@ -62,19 +81,6 @@ library AddressUtils {
     uint size;
     assembly { size := extcodesize(account) }
     return size > 0;
-  }
-  
-  function _setValue(
-    Address.Layout storage layout,
-    address newValue
-  ) internal {
-    layout.value = newValue;
-  }
-
-  function _getValue(
-    Address.Layout storage layout
-  ) view internal returns (address value) {
-    value = layout.value;
   }
 
   function _sendValue(address payable account, uint amount) internal {

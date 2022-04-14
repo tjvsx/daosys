@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-
 pragma solidity ^0.8.0;
+
+import {
+  Address,
+  AddressUtils
+} from "contracts/types/primitives/Address.sol";
 
 library Bytes4ToAddress {
 
   struct Layout {
-    mapping(bytes4 => address) value;
+    mapping(bytes4 => Address.Layout) value;
   }
 
 }
 
 library Bytes4ToAddressUtils {
+
+  using AddressUtils for Address.Layout;
 
   bytes32 constant internal STRUCT_STORAGE_SLOT = keccak256(type(Bytes4ToAddress).creationCode);
 
@@ -36,14 +42,22 @@ library Bytes4ToAddressUtils {
     bytes4 key,
     address newValue
   ) internal {
-    layout.value[key] = newValue;
+    layout.value[key]._setValue(newValue);
   }
 
   function _queryValue(
     Bytes4ToAddress.Layout storage layout,
     bytes4 key
   ) view internal returns (address value) {
-    value = layout.value[key];
+    value = layout.value[key]._getValue();
+  }
+
+  function _unmapValue(
+    Bytes4ToAddress.Layout storage layout,
+    bytes4 key
+  ) internal {
+    layout.value[key]._wipeValue();
+    delete layout.value[key];
   }
 
 }
