@@ -1,6 +1,6 @@
 import copy
 
-class Archive():
+class Series():
     
     def __init__(self, records = None):
         self.__records = [] if records == None else records

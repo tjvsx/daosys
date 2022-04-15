@@ -1,7 +1,7 @@
 from datetime import datetime
-from python.dev.event.record.archive import Archive
+from python.dev.event.record.series import Series
 
-class EventArchive(Archive):   
+class RecordSeries(Series):   
     def __init__(self, t0, records = None):
         super().__init__(records)
         self.__t0 = t0

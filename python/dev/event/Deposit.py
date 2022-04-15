@@ -2,10 +2,11 @@ from python.dev.event import Event
 
 class Deposit(Event):
     
-    def __init__(self, apy, delta, t_delta):
+    def __init__(self, apy, delta, t_delta, address = None):
         self.__t_delta = t_delta
         self.__delta = delta
         self.__apy = apy
+        self.__address = address
         
     def get_time_delta(self):
         return self.__t_delta
@@ -15,6 +16,9 @@ class Deposit(Event):
     
     def get_apy(self):
         return self.__apy
+
+    def get_address(self):
+        return self.__address
     
     def type_of(self):
         return Event.EVENT_DEPOSIT
