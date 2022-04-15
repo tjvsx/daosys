@@ -17,7 +17,7 @@ class AToken(Token):
     def get_record_series(self,address):
         return self.__record_map.get_records(address)
     
-    def init_address(self, time0, address):
+    def init_token(self, time0, address):
         self.__rec = Record(Deposit(0,0,0))
         self.__rec.init_first_record(time0)
  
