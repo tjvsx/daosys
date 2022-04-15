@@ -48,7 +48,7 @@ class PlotPriceCurve():
         plt.plot(x_val, y_val, label=p_label)
         plt.ylim(0, y_bound)
         plt.xlim(0, x_bound)
-        plt.legend()
+        #plt.legend()
         
     def plot_trade(self, price, delta, ltype = 'b--', p_lines = True):
         (x_swap,y_swap) = self.__cpt.swap_point(price, delta)  

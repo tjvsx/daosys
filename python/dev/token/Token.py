@@ -1,7 +1,6 @@
 from python.dev.token.supply import TokenSupply
 from python.dev.token.address import TokenAddress
 
-
 class Token():
     
     def __init__(self, name, supply = None, addresses = None):
