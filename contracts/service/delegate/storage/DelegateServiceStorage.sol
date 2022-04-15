@@ -35,15 +35,15 @@ library DelegateServiceStorageUtils {
   bytes32 constant internal STRUCT_STORAGE_SLOT = keccak256(type(DelegateServiceStorage).creationCode);
 
   function _structSlot() pure internal returns (bytes32 structSlot) {
-    structSlot = STRUCT_STORAGE_SLOT;
+    structSlot = STRUCT_STORAGE_SLOT
+      ^ Bytes4Utils._structSlot()
+      ^ Bytes4SetUtils._structSlot()
+      ^ AddressUtils._structSlot();
   }
 
   function _layout( bytes32 salt ) pure internal returns ( DelegateServiceStorage.Layout storage layout ) {
     bytes32 saltedSlot = salt
-      ^ DelegateServiceStorageUtils._structSlot()
-      ^ Bytes4Utils._structSlot()
-      ^ Bytes4SetUtils._structSlot()
-      ^ AddressUtils._structSlot();
+      ^ DelegateServiceStorageUtils._structSlot();
     assembly{ layout.slot := saltedSlot }
   }
 
