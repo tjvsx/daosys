@@ -10,6 +10,9 @@ class Event(ABC):
     def get_time_delta(self):
         pass
     @abstractmethod
+    def get_address(self):
+        pass    
+    @abstractmethod
     def type_of(self):
         pass
     @abstractmethod

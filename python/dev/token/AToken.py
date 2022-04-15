@@ -20,24 +20,26 @@ class AToken(Token):
     def init_address(self, time0, address):
         self.__rec = Record(Deposit(0,0,0))
         self.__record_map.add_init_time(time0, address)
-         
-    def deposit_event(self, apy, t_delta, delta, address):
+ 
+    def add_event(self, event):
         
         addresses = super().get_addresses()
         supply = super().get_supply()
+        address = event.get_address()
+        delta = event.get_delta()
         
-        event = Deposit(apy,delta,t_delta,address)
         self.__rec.update_event(event)
         delta = delta+self.__rec.get_yield() 
         
         if(not addresses.address_exist(address)):
             time0 = self.__record_map.get_init_time(address)
-            self.__record_map.add_record_series(RecordSeries(time0),address)
+            self.__record_map.add_record_series(RecordSeries(time0), address)
             addresses.set_balance(delta, address)
         else:        
             addresses.delta_balance(delta, address)
             
-        self.__record_map.add_record(self.__rec,address)                 
+        self.__record_map.add_record(self.__rec, address)                 
         supply.rebase(delta)  
+                
         
         

@@ -7,7 +7,10 @@ class MapRecordSeries():
         
     def get_address_records(self):
         return self.__address_records
- 
+
+    def get_init_times(self):
+        return self.__init_times    
+    
     def get_init_time(self, address):
         return self.__init_times[address]
 
