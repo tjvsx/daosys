@@ -23,14 +23,19 @@ library MessengerUtils {
   bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(MessengerStorage).creationCode);
 
   function _structSlot() pure internal returns (bytes32 structSlot) {
-    structSlot = STRUCT_STORAGE_SLOT;
+    structSlot = STRUCT_STORAGE_SLOT
+      ^ StringUtils._structSlot();
+  }
+
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
   }
 
   function _layout(bytes32 salt) pure internal returns (MessengerStorage.Layout storage layout) {
-    bytes32 saltedSlot =
-      salt 
-      ^ MessengerUtils._structSlot()
-      ^ StringUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 

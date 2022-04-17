@@ -25,6 +25,13 @@ library DelegateServiceRegistryStorageUtils {
       ^ Bytes4ToAddressUtils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   /**
    * @notice Could be optimized by having the exposing interface caclulate and store
    *  the storage slot as a constant.
@@ -32,9 +39,7 @@ library DelegateServiceRegistryStorageUtils {
    *  standardization.
    */
   function _layout( bytes32 salt ) pure internal returns ( DelegateServiceRegistryStorage.Layout storage layout ) {
-    bytes32 saltedSlot =
-      salt
-      ^ DelegateServiceRegistryStorageUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 
@@ -54,6 +59,13 @@ library DelegateServiceRegistryStorageUtils {
     bytes4 delegateServiceInterfaceId
   ) view internal returns (address delegateServiceAddress) {
     delegateServiceAddress = layout.delegateServiceForInterfaceId._queryValue(delegateServiceInterfaceId);
+  }
+
+  function _unmapDelegateService(
+    DelegateServiceRegistryStorage.Layout storage layout,
+    bytes4 delegateServiceInterfaceId
+  ) internal {
+    layout.delegateServiceForInterfaceId._unmapValue(delegateServiceInterfaceId);
   }
 
 }

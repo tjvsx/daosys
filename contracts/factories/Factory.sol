@@ -3,16 +3,15 @@
 pragma solidity ^0.8.0;
 
 import {
-  FactoryInternal,
-  FactoryUtils
-} from "./internal/FactoryInternal.sol";
+  FactoryLogic
+} from "contracts/factories/logic/FactoryLogic.sol";
 import {IFactory} from "./interfaces/Factory.sol";
 
 /**
  * @title Factory for arbitrary code deployment using the "CREATE" and "CREATE2" opcodes
  */
 // TODO Make ownable.
-contract Factory is FactoryInternal {
+contract Factory is FactoryLogic {
 
   /**
    * @notice deploy contract code using "CREATE" opcode
@@ -42,6 +41,18 @@ contract Factory is FactoryInternal {
    */
   function calculateDeploymentAddress (bytes32 initCodeHash, bytes32 salt) external view returns (address newAddress) {
     newAddress = _calculateDeploymentAddress(initCodeHash, salt);
+  }
+
+  function calculateDeploymentAddressFromAddress(
+      address deployer,
+      bytes32 initCodeHash,
+      bytes32 salt
+    ) pure external returns (address deploymenAddress) {
+    deploymenAddress = _calculateDeploymentAddressFromAddress(
+      deployer,
+      initCodeHash,
+      salt
+    );
   }
 
 }

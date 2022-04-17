@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-
 pragma solidity ^0.8.0;
 
 /**
@@ -50,12 +49,41 @@ library FactoryUtils {
    * @param salt input for deterministic address calculation
    * @return deployment address
    */
-  function _calculateDeploymentAddress(bytes32 initCodeHash, bytes32 salt) internal view returns (address) {
-    return address(uint160(uint256(keccak256(abi.encodePacked(
-      hex'ff',
-      address(this),
-      salt,
-      initCodeHash
-    )))));
+  function _calculateDeploymentAddress(bytes32 initCodeHash, bytes32 salt) view internal returns (address) {
+    return address(
+      uint160(
+        uint256(
+          keccak256(
+            abi.encodePacked(
+              hex'ff',
+              address(this),
+              salt,
+              initCodeHash
+            )
+          )
+        )
+      )
+    );
+  }
+
+  function _calculateDeploymentAddressFromAddress(
+      address deployer,
+      bytes32 initCodeHash,
+      bytes32 salt
+    ) pure internal returns (address deploymenAddress) {
+    deploymenAddress = address(
+      uint160(
+        uint256(
+          keccak256(
+            abi.encodePacked(
+              hex'ff',
+              deployer,
+              salt,
+              initCodeHash
+            )
+          )
+        )
+      )
+    );
   }
 }

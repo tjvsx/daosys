@@ -15,22 +15,18 @@ import {
   IServiceProxy
 } from "contracts/proxies/service/interfaces/IServiceProxy.sol";
 import {
-  FactoryInternal
-} from "contracts/factories/internal/FactoryInternal.sol";
+  FactoryLogic
+} from "contracts/factories/logic/FactoryLogic.sol";
 import {
   IServiceProxyFactory
 } from "contracts/factories/proxy/service/interfaces/IServiceProxyFactory.sol";
-// import {MinimalProxyFactoryInternal} from '../minimal/internal/MinimalProxyFactoryInternal.sol';
-// import {IDelegateService, DelegateService, DelegateServiceInternal} from "../../../service/delegate/DelegateService.sol";
-// import {FactoryInternal} from "../../internal/FactoryInternal.sol";
-// import {IServiceProxyFactory} from "./interfaces/IServiceProxyFactory.sol";
 
 contract ServiceProxyFactory
   is
     IServiceProxyFactory,
     ServiceProxyFactoryLogic,
     MinimalProxyFactoryLogic,
-    FactoryInternal
+    FactoryLogic
 {
 
   // address public delegateServiceRegistry;
@@ -94,73 +90,18 @@ contract ServiceProxyFactory
         _getDelegateServiceRegistry(type(IServiceProxyFactory).interfaceId)
       ).bulkQueryDelegateServiceAddress(delegateServiceInterfaceIds);
 
-    // bytes4 newProxyServiceId = _calculateServiceID(
-    //     delegateServiceInterfaceIds
-    //   );
-
     bytes32 deploymentSalt = _calculateDeploymentSalt(msg.sender, delegateServiceInterfaceIds);
     
     newServiceProxy = _deployMinimalProxyWithSalt(
-        serviceProxyTarget,
-        deploymentSalt
-      );
+      serviceProxyTarget,
+      deploymentSalt
+    );
 
     IServiceProxy(newServiceProxy).initializeServiceProxy(
-        delegateServices,
-        deploymentSalt
-      );
-
-    // for(uint16 iteration = 0; delegateServiceInterfaceIds.length > iteration; iteration++) {
-    //   address defaultDelegateService = IDelegateServiceRegistry(delegateServiceRegistry).getDefaultDelegateService(delegateServiceInterfaceIds[iteration]);
-    //   // bytes4[] memory delegateServiceFunctions = IDelegateService(defaultDelegateService).getDelegateServiceFunctions();
-    //   require(
-    //     IServiceProxy(newServiceProxy).delegateService(
-    //       defaultDelegateService
-    //     )
-    //   );
-    // }
+      delegateServices,
+      deploymentSalt
+    );
 
   }
-
-  // constructor() {
-  //   bytes4[] memory serviceProxyFactoryFunctions = new bytes4[](2);
-  //   serviceProxyFactoryFunctions[0] = IServiceProxyFactory.setDelegateServiceRegistry.selector;
-  //   serviceProxyFactoryFunctions[1] = IServiceProxyFactory.deployServiceProxy.selector;
-  //   _publishDelegateServiceSelf(
-  //     type(IServiceProxyFactory).interfaceId,
-  //     serviceProxyFactoryFunctions
-  //   );
-  // }
-
-  // // TODO Remove and integrate into deployment.
-  // function setDelegateServiceRegistry(
-  //   address newDelegateServiceRegistry
-  // ) external returns (bool result) {
-  //   delegateServiceRegistry = newDelegateServiceRegistry;
-  //   result = true;
-  // }
-
-  
-  
-  /**
-   * @dev Not intended for public use.
-   *  This exists for access to the raw ability to configure a new proxy.
-   */
-  // TODO Remove after development.
-  // function deployServiceProxyRaw(
-  //   address serviceProxy,
-  //   address delegateServiceTarget,
-  //   bytes4[] memory delegateServiceFunctions
-  // ) external returns (address newServiceProxy) {
-  //   newServiceProxy = _deployMinimalProxy(serviceProxy);
-
-  //   require(
-  //     IServiceProxy(newServiceProxy).registerRawDelegateService(
-  //       delegateServiceTarget,
-  //       delegateServiceFunctions
-  //     )
-  //   );
-
-  // }
 
 }

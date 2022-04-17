@@ -128,6 +128,27 @@ library AddressUtils {
     }
   }
 
+  function _calculateDeploymentAddressFromAddress(
+      address deployer,
+      bytes32 initCodeHash,
+      bytes32 salt
+    ) pure internal returns (address deploymenAddress) {
+    deploymenAddress = address(
+      uint160(
+        uint256(
+          keccak256(
+            abi.encodePacked(
+              hex'ff',
+              deployer,
+              salt,
+              initCodeHash
+            )
+          )
+        )
+      )
+    );
+  }
+
 }
 
 /* -------------------------------------------------------------------------- */

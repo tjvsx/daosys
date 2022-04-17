@@ -7,7 +7,7 @@ import {FactoryUtils} from "../libraries/FactoryUtils.sol";
 /**
  * @title Factory for arbitrary code deployment using the "CREATE" and "CREATE2" opcodes
  */
-abstract contract FactoryInternal {
+abstract contract FactoryLogic {
   /**
    * @notice deploy contract code using "CREATE" opcode
    * @param initCode contract initialization code
@@ -36,5 +36,17 @@ abstract contract FactoryInternal {
    */
   function _calculateDeploymentAddress(bytes32 initCodeHash, bytes32 salt) internal view returns (address) {
     return FactoryUtils._calculateDeploymentAddress(initCodeHash, salt);
+  }
+
+  function _calculateDeploymentAddressFromAddress(
+      address deployer,
+      bytes32 initCodeHash,
+      bytes32 salt
+    ) pure internal returns (address deploymenAddress) {
+    deploymenAddress = _calculateDeploymentAddressFromAddress(
+      deployer,
+      initCodeHash,
+      salt
+    );
   }
 }

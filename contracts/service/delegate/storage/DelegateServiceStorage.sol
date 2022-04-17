@@ -41,9 +41,15 @@ library DelegateServiceStorageUtils {
       ^ AddressUtils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   function _layout( bytes32 salt ) pure internal returns ( DelegateServiceStorage.Layout storage layout ) {
-    bytes32 saltedSlot = salt
-      ^ DelegateServiceStorageUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 

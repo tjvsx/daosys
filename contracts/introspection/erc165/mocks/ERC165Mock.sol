@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.0;
 
-import {ERC165, ERC165Internal, IERC165} from '../ERC165.sol';
+import {
+  IERC165,
+  ERC165
+} from 'contracts/introspection/erc165/ERC165.sol';
 
 contract ERC165Mock
   is
