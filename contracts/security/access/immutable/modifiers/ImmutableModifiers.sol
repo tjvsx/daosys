@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: AGPL-V3-or-later
 pragma solidity ^0.8.0;
 
-// import {
-//   ImmutableLib,
-//   ImmutableStorage
-// } from "../libraries/ImmutableLib.sol";
+import {
+  ImmutableStorage,
+  ImmutableStorageUtils
+} from "contracts/security/access/immutable/storage/ImmutableStorage.sol";
 
-// abstract contract ImmutableModifiers {
+abstract contract ImmutableModifiers {
   
-//   using ImmutableLib for ImmutableStorage.Layout;
+  using ImmutableStorageUtils for ImmutableStorage.Layout;
 
-//   modifier isNotImmutable( bytes32 identifier ) {
-//     require( !ImmutableLib._layout( ImmutableLib._encodeImmutableStorage(identifier) )._isImmutable(), "Immutable:: This function is immutable." );
-//     _;
-//     ImmutableLib._layout( ImmutableLib._encodeImmutableStorage(identifier) )._makeImmutable();
-//   }
+  modifier isNotImmutable( bytes32 storageSlot ) {
+    require( !ImmutableStorageUtils._layout( ImmutableStorageUtils._encodeImmutableStorage(storageSlot) )._isImmutable(), "Immutable:: This function is immutable." );
+    _;
+    ImmutableStorageUtils._layout( ImmutableStorageUtils._encodeImmutableStorage(storageSlot) )._makeImmutable();
+  }
   
-// }
+}
