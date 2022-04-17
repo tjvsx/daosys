@@ -28,4 +28,16 @@ contract ServiceProxyMock is ServiceProxy {
 
   }
 
+  function IServiceProxyInterfaceId() pure external returns (bytes4 interfaceId) {
+    interfaceId = type(IServiceProxy).interfaceId;
+  }
+
+  function getImplementationFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxy.getImplementation.selector;
+  }
+
+  function initializeServiceProxyFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxy.initializeServiceProxy.selector;
+  }
+
 }

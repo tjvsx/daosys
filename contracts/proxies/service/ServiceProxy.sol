@@ -8,6 +8,9 @@ import {
 import {
   IServiceProxy
 } from "contracts/proxies/service/interfaces/IServiceProxy.sol";
+import {
+  IDelegateService
+} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
 /**
  * @title Base proxy contract
@@ -33,4 +36,23 @@ contract ServiceProxy is IServiceProxy, ServiceProxyLogic, Proxy {
       functionSelector
     );
   }
+
+  function initializeServiceProxy(
+    address[] calldata delegateServices
+  ) external returns (bool success) {
+
+    for(uint16 iteration = 0; delegateServices.length > iteration; iteration++) {
+      IDelegateService.ServiceDef memory delegateServiceDef = IDelegateService(delegateServices[iteration])
+        .getServiceDef();
+
+      _registerDelegateService(
+          type(IServiceProxy).interfaceId,
+          delegateServices[iteration],
+          delegateServiceDef.functionSelectors
+        );
+    }
+
+    success = true;
+  }
+
 }

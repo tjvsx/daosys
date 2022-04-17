@@ -5,6 +5,10 @@ interface IDelegateServiceRegistry {
   
   function queryDelegateServiceAddress(
     bytes4 delegateServiceInterfaceId
-  ) view external returns (address delegateService);
+  ) view external returns (address delegateServiceAddress  );
+
+  function bulkQueryDelegateServiceAddress(
+    bytes4[] calldata delegateServiceInterfaceIds
+  ) view external returns (address[] memory delegateServiceAddresses);
 
 }

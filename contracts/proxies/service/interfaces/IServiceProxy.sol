@@ -6,4 +6,8 @@ interface IServiceProxy {
   function getImplementation(
     bytes4 functionSelector   
   ) view external returns (address delegateService);
+
+  function initializeServiceProxy(
+    address[] calldata delegateServices
+  ) external returns (bool success);
 }

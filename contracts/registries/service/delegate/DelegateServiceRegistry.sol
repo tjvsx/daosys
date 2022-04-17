@@ -8,7 +8,11 @@ import {
   IDelegateServiceRegistry
 } from "contracts/registries/service/delegate/interfaces/IDelegateServiceRegistry.sol";
 
-contract DelegateServiceRegistry is DelegateServiceLogic {
+contract DelegateServiceRegistry
+  is
+    IDelegateServiceRegistry,
+    DelegateServiceLogic
+{
 
   function registerDelegateService(
     bytes4 delegateServiceInterfaceId,
@@ -23,10 +27,19 @@ contract DelegateServiceRegistry is DelegateServiceLogic {
 
   function queryDelegateServiceAddress(
     bytes4 delegateServiceInterfaceId
-  ) view external returns (address delegateService) {
-    delegateService = _queryDelegateService(
+  ) view external returns (address delegateServiceAddress) {
+    delegateServiceAddress = _queryDelegateService(
       type(IDelegateServiceRegistry).interfaceId,
       delegateServiceInterfaceId
+    );
+  }
+
+  function bulkQueryDelegateServiceAddress(
+    bytes4[] calldata delegateServiceInterfaceIds
+  ) view external returns (address[] memory delegateServiceAddresses) {
+    delegateServiceAddresses = _bulkQueryDelegateService(
+      type(IDelegateServiceRegistry).interfaceId,
+      delegateServiceInterfaceIds
     );
   }
 
