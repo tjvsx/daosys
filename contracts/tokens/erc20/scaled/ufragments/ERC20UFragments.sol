@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.0;
 
-import {ERC20UFragmentsInternal} from "./internal/ERC20UFragmentsInternal.sol";
-import {ERC20Metadata} from "../../metadata/ERC20Metadata.sol";
-import {ERC20Account} from "../../account/ERC20Account.sol";
+import {ERC20UFragmentsLogic} from "contracts/tokens/erc20/scaled/ufragments/logic/ERC20UFragmentsLogic.sol";
+import {ERC20Metadata} from "contracts/tokens/erc20/metadata/ERC20Metadata.sol";
+import {ERC20Account} from "contracts/tokens/erc20/account/ERC20Account.sol";
 import {IERC20UFragments} from "contracts/tokens/erc20/scaled/ufragments/interfaces/IERC20UFragments.sol";
-import {IERC20} from "../../interfaces/IERC20.sol";
-import {FullMath} from "../../../../math/FullMath.sol";
+import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
+import {FullMath} from "contracts/math/FullMath.sol";
 
 contract ERC20UFragments
   is
     IERC20UFragments,
-    ERC20UFragmentsInternal,
+    ERC20UFragmentsLogic,
     ERC20Account,
     ERC20Metadata
 {

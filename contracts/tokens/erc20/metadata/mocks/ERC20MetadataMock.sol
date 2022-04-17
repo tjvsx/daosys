@@ -2,11 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {
-  ERC20Metadata,
-  ERC20MetadataInternal,
-  ERC20MetadataUtils,
-  ERC20MetadataStorage
-} from "../ERC20Metadata.sol";
+  ERC20Metadata
+} from "contracts/tokens/erc20/metadata/ERC20Metadata.sol";
 import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
 
 contract ERC20MetadataMock is ERC20Metadata {

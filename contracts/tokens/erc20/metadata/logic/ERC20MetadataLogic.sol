@@ -6,7 +6,7 @@ import {
   ERC20MetadataStorage
 } from "contracts/tokens/erc20/metadata/storage/ERC20MetadataStorage.sol";
 
-abstract contract ERC20MetadataInternal {
+abstract contract ERC20MetadataLogic {
 
   using ERC20MetadataUtils for ERC20MetadataStorage.Layout;
 

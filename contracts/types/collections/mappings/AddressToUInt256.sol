@@ -18,6 +18,7 @@ library AddressToUInt256 {
 library AddressToUInt256Utils {
 
   using AddressToUInt256Utils for AddressToUInt256.Layout;
+  using UInt256Utils for UInt256.Layout;
 
   bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(AddressToUInt256).creationCode);
 
@@ -26,11 +27,39 @@ library AddressToUInt256Utils {
       ^ UInt256Utils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   function _layout( bytes32 salt ) pure internal returns ( AddressToUInt256.Layout storage layout ) {
-    bytes32 saltedSlot =
-      salt
-      ^ AddressToUInt256Utils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
+  }
+
+  function _mapValue(
+    AddressToUInt256.Layout storage layout,
+    address key,
+    uint256 newValue
+  ) internal {
+    layout.value[key]._setValue(newValue);
+  }
+
+  function _queryValue(
+    AddressToUInt256.Layout storage layout,
+    address key
+  ) view internal returns (uint256 value) {
+    value = layout.value[key]._getValue();
+  }
+
+  function _unmapValue(
+    AddressToUInt256.Layout storage layout,
+    address key
+  ) internal {
+    layout.value[key]._wipeValue();
+    delete layout.value[key];
   }
 
 }

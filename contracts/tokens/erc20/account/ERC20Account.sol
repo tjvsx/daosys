@@ -2,13 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {
-  ERC20AccountInternal,
+  ERC20AccountLogic,
   ERC20AccountUtils,
   ERC20AccountStorage
-} from "./internal/ERC20AccountInternal.sol";
+} from "contracts/tokens/erc20/account/logic/ERC20AccountLogic.sol";
 import {IERC20} from "../interfaces/IERC20.sol";
 
-abstract contract ERC20Account is ERC20AccountInternal {
+abstract contract ERC20Account is ERC20AccountLogic {
 
   using ERC20AccountUtils for ERC20AccountStorage.Layout;
 

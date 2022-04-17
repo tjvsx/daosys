@@ -6,7 +6,7 @@ import {
   ERC20UFragmentsStorage
 } from "contracts/tokens/erc20/scaled/ufragments/storage/ERC20UFragmentsStorage.sol";
 
-abstract contract ERC20UFragmentsInternal {
+abstract contract ERC20UFragmentsLogic {
 
   using ERC20UFragmentsUtils for ERC20UFragmentsStorage.Layout;
 

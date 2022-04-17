@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import {
-  ERC20Account,
-  ERC20AccountInternal,
-  ERC20AccountUtils,
-  ERC20AccountStorage
-} from "../ERC20Account.sol";
+  ERC20Account
+  // ERC20AccountLogic,
+  // ERC20AccountUtils,
+  // ERC20AccountStorage
+} from "contracts/tokens/erc20/account/ERC20Account.sol";
 import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
 
 contract ERC20AccountMock is ERC20Account {

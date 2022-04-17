@@ -30,6 +30,13 @@ library StringUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   /**
    * @notice Could be optimized by having the exposing interface caclulate and store
    *  the storage slot as a constant.
@@ -37,8 +44,7 @@ library StringUtils {
    *  standardization.
    */
   function _layout( bytes32 salt ) pure internal returns ( String.Layout storage layout ) {
-    bytes32 saltedSlot = salt
-      ^ StringUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
   
@@ -53,6 +59,12 @@ library StringUtils {
     String.Layout storage layout
   ) view internal returns (string memory value) {
     value = layout.value;
+  }
+
+  function _wipeValue(
+    String.Layout storage layout
+  ) internal {
+    delete layout.value;
   }
 
 }

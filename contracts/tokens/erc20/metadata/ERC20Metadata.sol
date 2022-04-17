@@ -2,13 +2,16 @@
 pragma solidity ^0.8.0;
 
 import {
-  ERC20MetadataInternal,
+  ERC20MetadataLogic,
   ERC20MetadataUtils,
   ERC20MetadataStorage
-} from "./internal/ERC20MetadataInternal.sol";
+} from "contracts/tokens/erc20/metadata/logic/ERC20MetadataLogic.sol";
 import {IERC20} from "contracts/tokens/erc20/interfaces/IERC20.sol";
 
-abstract contract ERC20Metadata is ERC20MetadataInternal {
+abstract contract ERC20Metadata
+  is
+    ERC20MetadataLogic
+{
 
   function _name(bytes32 storageSlotSalt) view internal returns (string memory tokenName) {
     tokenName = _getName(storageSlotSalt);

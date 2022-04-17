@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-
 pragma solidity ^0.8.0;
 
 
@@ -30,6 +29,13 @@ library Bytes4Utils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   /**
    * @notice Could be optimized by having the exposing interface caclulate and store
    *  the storage slot as a constant.
@@ -37,8 +43,7 @@ library Bytes4Utils {
    *  standardization.
    */
   function _layout( bytes32 salt ) pure internal returns ( Bytes4.Layout storage layout ) {
-    bytes32 saltedSlot = salt
-      ^ Bytes4Utils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
   
@@ -53,6 +58,12 @@ library Bytes4Utils {
     Bytes4.Layout storage layout
   ) view internal returns (bytes4 value) {
     value = layout.value;
+  }
+
+  function _wipeValue(
+    Bytes4.Layout storage layout
+  ) internal {
+    delete layout.value;
   }
 
 }

@@ -30,6 +30,13 @@ library AddressUtils {
     structSlot = STRUCT_STORAGE_SLOT;
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   /**
    * @notice Could be optimized by having the exposing interface caclulate and store
    *  the storage slot as a constant.
@@ -37,8 +44,7 @@ library AddressUtils {
    *  standardization.
    */
   function _layout( bytes32 salt ) pure internal returns ( Address.Layout storage layout ) {
-    bytes32 saltedSlot = salt
-      ^ AddressUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 

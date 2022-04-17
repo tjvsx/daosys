@@ -1,41 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.0;
 
-import {
-  UInt256,
-  UInt256Utils
-} from "../primitives/UInt256.sol";
 
 /* -------------------------------------------------------------------------- */
-/*                            SECION Uint256Counter                           */
+/*                             SECTION Bytes4                                 */
 /* -------------------------------------------------------------------------- */
 
-library UInt256Counter {
+library Bool {
 
   struct Layout {
-    UInt256.Layout count;
+    bool value;
   }
 
 }
-
 /* -------------------------------------------------------------------------- */
-/*                           !SECION Uint256Counter                           */
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                         SECTION Uint256CounterUtils                        */
+/*                             !SECTION Bytes4                                */
 /* -------------------------------------------------------------------------- */
 
-library UInt256CounterUtils {
+/* -------------------------------------------------------------------------- */
+/*                             SECTION Bytes4Utils                            */
+/* -------------------------------------------------------------------------- */
 
-  using UInt256CounterUtils for UInt256Counter.Layout;
-  using UInt256Utils for UInt256.Layout;
+library BoolUtils {
 
-  bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(UInt256Counter).creationCode);
+  bytes32 constant internal STRUCT_STORAGE_SLOT = keccak256(type(Bool).creationCode);
 
   function _structSlot() pure internal returns (bytes32 structSlot) {
-    structSlot = STRUCT_STORAGE_SLOT
-      ^ UInt256Utils._structSlot();
+    structSlot = STRUCT_STORAGE_SLOT;
   }
 
   function _saltStorageSlot(
@@ -51,26 +42,31 @@ library UInt256CounterUtils {
    *  Storage slot is computed during runtime to facilitate development during
    *  standardization.
    */
-  function _layout( bytes32 salt ) pure internal returns ( UInt256Counter.Layout storage layout ) {
+  function _layout( bytes32 salt ) pure internal returns ( Bool.Layout storage layout ) {
     bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
-
-  function _current(
-    UInt256Counter.Layout storage layout
-  ) view internal returns (uint256 currentCount) {
-    currentCount = layout.count._getValue();
+  
+  function _setValue(
+    Bool.Layout storage layout,
+    bool newValue
+  ) internal {
+    layout.value = newValue;
   }
 
-  function _next(
-    UInt256Counter.Layout storage layout
-  ) internal returns (uint256 lastCount) {
-    lastCount = layout.count._getValue();
-    layout.count._setValue(++lastCount);
+  function _getValue(
+    Bool.Layout storage layout
+  ) view internal returns (bool value) {
+    value = layout.value;
+  }
+
+  function _wipeValue(
+    Bool.Layout storage layout
+  ) internal {
+    delete layout.value;
   }
 
 }
-
 /* -------------------------------------------------------------------------- */
-/*                        !SECTION Uint256CounterUtils                        */
+/*                            !SECTION Bytes4Utils                            */
 /* -------------------------------------------------------------------------- */

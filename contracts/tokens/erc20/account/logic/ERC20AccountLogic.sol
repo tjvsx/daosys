@@ -6,7 +6,7 @@ import {
   ERC20AccountStorage
 } from "contracts/tokens/erc20/account/storage/ERC20AccountStorage.sol";
 
-abstract contract ERC20AccountInternal {
+abstract contract ERC20AccountLogic {
 
   using ERC20AccountUtils for ERC20AccountStorage.Layout;
 
