@@ -9,6 +9,15 @@ interface IServiceProxyFactory {
     bytes32 salt
   ) view external returns (address newAddress);
 
+  function calculateMinimalProxyDeploymentAddress(address target, bytes32 salt) external view returns (address);
+
+  function generateMinimalProxyInitCode(address target) external pure returns (bytes memory);
+
+  function calculateDeploymentSalt(
+    address deployer,
+    bytes4[] calldata delegateServiceInterfaceIds
+  ) pure external returns (bytes32 deploymentSalt);
+
   function deployServiceProxy(
     bytes4[] calldata delegateServiceInterfaceIds
   ) external returns (address newServiceProxy);

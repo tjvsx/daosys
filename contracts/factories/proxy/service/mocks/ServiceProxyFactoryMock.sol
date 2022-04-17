@@ -40,6 +40,18 @@ contract ServiceProxyFactoryMock
     functionSelector = IServiceProxyFactory.calculateDeploymentAddress.selector;
   }
 
+  function calculateMinimalProxyDeploymentAddressFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxyFactory.calculateMinimalProxyDeploymentAddress.selector;
+  }
+
+  function generateMinimalProxyInitCodeFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxyFactory.generateMinimalProxyInitCode.selector;
+  }
+
+  function calculateDeploymentSaltFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxyFactory.calculateDeploymentSalt.selector;
+  }
+
   function deployServiceProxyFunctionSelector() pure external returns (bytes4 functionSelector) {
     functionSelector = IServiceProxyFactory.deployServiceProxy.selector;
   }

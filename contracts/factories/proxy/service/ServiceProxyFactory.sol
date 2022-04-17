@@ -98,14 +98,17 @@ contract ServiceProxyFactory
     //     delegateServiceInterfaceIds
     //   );
 
-    // bytes32 deploymentSalt = _calculateDeploymentSalt(msg.sender, delegateServiceInterfaceIds);
+    bytes32 deploymentSalt = _calculateDeploymentSalt(msg.sender, delegateServiceInterfaceIds);
     
     newServiceProxy = _deployMinimalProxyWithSalt(
         serviceProxyTarget,
-        _calculateDeploymentSalt(msg.sender, delegateServiceInterfaceIds)
+        deploymentSalt
       );
 
-    IServiceProxy(newServiceProxy).initializeServiceProxy(delegateServices);
+    IServiceProxy(newServiceProxy).initializeServiceProxy(
+        delegateServices,
+        deploymentSalt
+      );
 
     // for(uint16 iteration = 0; delegateServiceInterfaceIds.length > iteration; iteration++) {
     //   address defaultDelegateService = IDelegateServiceRegistry(delegateServiceRegistry).getDefaultDelegateService(delegateServiceInterfaceIds[iteration]);

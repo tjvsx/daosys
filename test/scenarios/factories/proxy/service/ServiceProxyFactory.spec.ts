@@ -38,27 +38,29 @@ describe("ServiceProxyFactory", function () {
 
   // Service Proxy test variables
   let proxy: ServiceProxyMock;
-  const IServiceProxyInterfaceId = '0xc0531447';
+  const IServiceProxyInterfaceId = '0x26ddf639';
   const getImplementationFunctionSelector = '0xdc9cc645';
-  const initializeServiceProxyFunctionSelector = '0x1ccfd202';
+  const initializeServiceProxyFunctionSelector = '0x5cc0292c';
+  const getDeploymentMetadataFunctionSelector = '0xa6811950';
 
   let proxyAsMessenger: MessengerDelegateService;
 
   let delegateServiceRegistry: DelegateServiceRegistryMock;
-
   const IDelegateServiceRegistryInterfaceId = '0xb0184e40';
   const queryDelegateServiceAddressFunctionSelector = '0x03714859';
   const bulkQueryDelegateServiceAddressFunctionSelector = '0xb3690619';
 
   let serviceProxyFactory: ServiceProxyFactoryMock
-
-  const IServiceProxyFactoryInterfaceId = '0x80bd770b';
+  const IServiceProxyFactoryInterfaceId = '0xaba885ba';
   const calculateDeploymentAddressFunctionSelector = '0x487a3a38';
+  const calculateMinimalProxyDeploymentAddressFunctionSelector = '0xfe8681a1';
+  const generateMinimalProxyInitCodeFunctionSelector = '0xbbb6c138';
+  const calculateDeploymentSaltFunctionSelector = '0x6e25b228';
   const deployServiceProxyFunctionSelector = '0xc8c74d33';
 
   // let newServiceProxyAddress: string;
   let newServiceProxyAsMessenger: MessengerDelegateService;
-  // let newServiceProxy: ServiceProxyMock;
+  let newServiceProxy: ServiceProxyMock;
 
   /* -------------------------------------------------------------------------- */
   /*              SECTION ServiceProxyFactory Before All Test Hook              */
@@ -111,7 +113,7 @@ describe("ServiceProxyFactory", function () {
 
   describe("ServiceProxyFactory", function () {
 
-    describe("MessengerDelegateService", function () {
+    describe("::MessengerDelegateService", function () {
 
       describe("Messenger", function () {
 
@@ -192,7 +194,10 @@ describe("ServiceProxyFactory", function () {
           expect(await proxy.initializeServiceProxyFunctionSelector())
             .to.equal(initializeServiceProxyFunctionSelector);
         });
-
+        it("getDeploymentMetadataFunctionSelector.", async function () {
+          expect(await proxy.getDeploymentMetadataFunctionSelector())
+            .to.equal(getDeploymentMetadataFunctionSelector);
+        });
       });
 
       describe("queryForDelegateService()", function () {
@@ -307,6 +312,18 @@ describe("ServiceProxyFactory", function () {
           expect(await serviceProxyFactory.calculateDeploymentAddressFunctionSelector())
             .to.equal(calculateDeploymentAddressFunctionSelector);
         });
+        it("calculateMinimalProxyDeploymentAddressFunctionSelector.", async function () {
+          expect(await serviceProxyFactory.calculateMinimalProxyDeploymentAddressFunctionSelector())
+            .to.equal(calculateMinimalProxyDeploymentAddressFunctionSelector);
+        });
+        it("generateMinimalProxyInitCodeFunctionSelector.", async function () {
+          expect(await serviceProxyFactory.generateMinimalProxyInitCodeFunctionSelector())
+            .to.equal(generateMinimalProxyInitCodeFunctionSelector);
+        });
+        it("calculateDeploymentSaltFunctionSelector.", async function () {
+          expect(await serviceProxyFactory.calculateDeploymentSaltFunctionSelector())
+            .to.equal(calculateDeploymentSaltFunctionSelector);
+        });
         it("deployServiceProxyFunctionSelector.", async function () {
           expect(await serviceProxyFactory.deployServiceProxyFunctionSelector())
             .to.equal(deployServiceProxyFunctionSelector);
@@ -353,8 +370,23 @@ describe("ServiceProxyFactory", function () {
           newServiceProxyAsMessenger = await ethers.getContractAt("MessengerDelegateService", newServiceProxyAddress) as MessengerDelegateService;
           tracer.nameTags[newServiceProxyAsMessenger.address] = "ServiceProxyAsMessenger";
 
+          newServiceProxy = await ethers.getContractAt("ServiceProxyMock", newServiceProxyAddress) as ServiceProxyMock;
+          tracer.nameTags[newServiceProxyAsMessenger.address] = "ServiceProxyAsMessenger";
+
           await newServiceProxyAsMessenger.setMessage("Hello World!");
           expect(await newServiceProxyAsMessenger.getMessage()).to.equal("Hello World!");
+
+          const serviceProxyMetadata = await newServiceProxy.getDeploymentMetadata();
+
+          expect(serviceProxyMetadata.deploymentSalt).to.equal(
+            await serviceProxyFactory.calculateDeploymentSalt(
+                deployer.address,
+                [
+                  await messengerDelegateService.IMessengerInterfaceId()
+                ]
+              )
+            );
+          expect(serviceProxyMetadata.proxyFactoryAddress).to.equal(serviceProxyFactory.address);
         });
       });
 

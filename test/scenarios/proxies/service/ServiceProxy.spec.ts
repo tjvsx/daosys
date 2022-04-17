@@ -11,7 +11,7 @@ import {
   ServiceProxyMock__factory
 } from '../../../../typechain';
 
-describe("Proxy", function () {
+describe("Service Proxy", function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
@@ -26,9 +26,10 @@ describe("Proxy", function () {
   const getMessageFunctionSelector = '0xce6d41de';
 
   let proxy: ServiceProxyMock;
-  const IServiceProxyInterfaceId = '0xc0531447';
+  const IServiceProxyInterfaceId = '0x26ddf639';
   const getImplementationFunctionSelector = '0xdc9cc645';
-  const initializeServiceProxyFunctionSelector = '0x1ccfd202';
+  const initializeServiceProxyFunctionSelector = '0x5cc0292c';
+  const getDeploymentMetadataFunctionSelector = '0xa6811950';
 
   let proxyAsMessenger: MessengerDelegateService;
 
@@ -91,7 +92,10 @@ describe("Proxy", function () {
         expect(await proxy.initializeServiceProxyFunctionSelector())
           .to.equal(initializeServiceProxyFunctionSelector);
       });
-
+      it("getDeploymentMetadataFunctionSelector.", async function () {
+        expect(await proxy.getDeploymentMetadataFunctionSelector())
+          .to.equal(getDeploymentMetadataFunctionSelector);
+      });
     });
 
     describe("Messenger", function () {

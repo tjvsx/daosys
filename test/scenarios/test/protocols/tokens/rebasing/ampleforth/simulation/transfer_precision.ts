@@ -103,7 +103,7 @@ async function exec() {
   } while ((await uFragments.totalSupply()).add(rebaseAmt).lt(endSupply))
 }
 
-describe('Transfer Precision', function () {
+describe.skip('Transfer Precision', function () {
   it('should successfully run simulation', async function () {
     await exec()
   })

@@ -40,4 +40,8 @@ contract ServiceProxyMock is ServiceProxy {
     functionSelector = IServiceProxy.initializeServiceProxy.selector;
   }
 
+  function getDeploymentMetadataFunctionSelector() pure external returns (bytes4 functionSelector) {
+    functionSelector = IServiceProxy.getDeploymentMetadata.selector;
+  }
+
 }
