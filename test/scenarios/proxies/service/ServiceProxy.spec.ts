@@ -11,20 +11,26 @@ import {
   ServiceProxyMock__factory
 } from '../../../../typechain';
 
-describe("Proxy", function () {
+describe("Service Proxy", function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
-  const IMessengerInterfaceId = "0xf8e6c6ac";
-  const setMessageFunctionSelector = '0x368b8772';
-  const getMessageFunctionSelector = '0xce6d41de';
 
   // Test Wallets
   let deployer: SignerWithAddress;
 
   // TestService test variables
   let messenger: MessengerDelegateService;
+  const IMessengerInterfaceId = "0xf8e6c6ac";
+  const setMessageFunctionSelector = '0x368b8772';
+  const getMessageFunctionSelector = '0xce6d41de';
+
   let proxy: ServiceProxyMock;
+  const IServiceProxyInterfaceId = '0x26ddf639';
+  const getImplementationFunctionSelector = '0xdc9cc645';
+  const initializeServiceProxyFunctionSelector = '0x5cc0292c';
+  const getDeploymentMetadataFunctionSelector = '0xa6811950';
+
   let proxyAsMessenger: MessengerDelegateService;
 
   /* -------------------------------------------------------------------------- */
@@ -70,20 +76,40 @@ describe("Proxy", function () {
   /*                        SECTION Testing ServiceProxy                        */
   /* -------------------------------------------------------------------------- */
 
-  describe("Messenger", function () {
 
-    describe("#getMessage()", function () {
-      describe("()", function () {
-        it("Can set and get message", async function () {
-          await messenger.setMessage("Hello World!");
-          expect(await messenger.getMessage()).to.equal("Hello World!");
-        });
+  describe("ServiceProxy", function () {
+
+    describe("Validate interface and function selector computation", function () {
+      it("IServiceProxyInterfaceId.", async function () {
+        expect(await proxy.IServiceProxyInterfaceId())
+          .to.equal(IServiceProxyInterfaceId);
+      });
+      it("getImplementationFunctionSelector.", async function () {
+        expect(await proxy.getImplementationFunctionSelector())
+          .to.equal(getImplementationFunctionSelector);
+      });
+      it("initializeServiceProxyFunctionSelector.", async function () {
+        expect(await proxy.initializeServiceProxyFunctionSelector())
+          .to.equal(initializeServiceProxyFunctionSelector);
+      });
+      it("getDeploymentMetadataFunctionSelector.", async function () {
+        expect(await proxy.getDeploymentMetadataFunctionSelector())
+          .to.equal(getDeploymentMetadataFunctionSelector);
       });
     });
 
-  });
+    describe("Messenger", function () {
 
-  describe("Proxy", function () {
+      describe("#getMessage()", function () {
+        describe("()", function () {
+          it("Can set and get message", async function () {
+            await messenger.setMessage("Hello World!");
+            expect(await messenger.getMessage()).to.equal("Hello World!");
+          });
+        });
+      });
+
+    });
 
     describe("queryForDelegateService()", function () {
       it("Can set and get delegate service", async function () {

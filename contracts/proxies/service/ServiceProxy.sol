@@ -8,11 +8,19 @@ import {
 import {
   IServiceProxy
 } from "contracts/proxies/service/interfaces/IServiceProxy.sol";
+import {
+  IDelegateService
+} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
 /**
  * @title Base proxy contract
  */
-contract ServiceProxy is IServiceProxy, ServiceProxyLogic, Proxy {
+contract ServiceProxy
+  is
+    IServiceProxy,
+    ServiceProxyLogic,
+    Proxy
+{
 
   /**
    * @notice get logic implementation address
@@ -33,4 +41,37 @@ contract ServiceProxy is IServiceProxy, ServiceProxyLogic, Proxy {
       functionSelector
     );
   }
+
+  function initializeServiceProxy(
+    address[] calldata delegateServices,
+    bytes32 deploymentSalt
+  ) external returns (bool success) {
+
+    _setDeploymentMetadata(
+      type(IServiceProxy).interfaceId,
+      deploymentSalt,
+      msg.sender
+    );
+
+    for(uint16 iteration = 0; delegateServices.length > iteration; iteration++) {
+      IDelegateService.ServiceDef memory delegateServiceDef = IDelegateService(delegateServices[iteration])
+        .getServiceDef();
+
+      _registerDelegateService(
+          type(IServiceProxy).interfaceId,
+          delegateServices[iteration],
+          delegateServiceDef.functionSelectors
+        );
+    }
+
+    success = true;
+  }
+
+  function getDeploymentMetadata() view external returns (ServiceProxyMetadata memory serviceProxyMetadata) {
+    (
+      serviceProxyMetadata.deploymentSalt,
+      serviceProxyMetadata.proxyFactoryAddress
+    ) = _getDeploymentMetadata(type(IServiceProxy).interfaceId);
+  }
+
 }

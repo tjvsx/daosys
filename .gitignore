@@ -23,4 +23,6 @@ yarn.lock
 
 .yarn/
 
+.yarnrc.yml
+
 *.lock

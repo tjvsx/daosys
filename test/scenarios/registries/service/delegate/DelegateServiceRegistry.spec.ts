@@ -7,8 +7,8 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {
   MessengerDelegateService,
   MessengerDelegateService__factory,
-  DelegateServiceRegistry,
-  DelegateServiceRegistry__factory
+  DelegateServiceRegistryMock,
+  DelegateServiceRegistryMock__factory
 } from '../../../../../typechain';
 
 describe("Delegate Service Registry", function () {
@@ -22,13 +22,18 @@ describe("Delegate Service Registry", function () {
 
   // TestService test variables
   let messengerDelegateService: MessengerDelegateService;
-  let delegateServiceRegistry: DelegateServiceRegistry;
 
   const IDelegateServiceInterfaceId = '0xd56eb69e';
   const getServiceDefFunctionSelector = '0xd56eb69e';
   const IMessengerInterfaceId = "0xf8e6c6ac";
   const setMessageFunctionSelector = '0x368b8772';
   const getMessageFunctionSelector = '0xce6d41de';
+
+  let delegateServiceRegistry: DelegateServiceRegistryMock;
+
+  const IDelegateServiceRegistryInterfaceId = '0xb0184e40';
+  const queryDelegateServiceAddressFunctionSelector = '0x03714859';
+  const bulkQueryDelegateServiceAddressFunctionSelector = '0xb3690619';
 
   /* -------------------------------------------------------------------------- */
   /*                        SECTION Before All Test Hook                        */
@@ -56,7 +61,7 @@ describe("Delegate Service Registry", function () {
     messengerDelegateService = await new MessengerDelegateService__factory(deployer).deploy();
     tracer.nameTags[messengerDelegateService.address] = "Messenger Delegate Service";
 
-    delegateServiceRegistry = await new DelegateServiceRegistry__factory(deployer).deploy();
+    delegateServiceRegistry = await new DelegateServiceRegistryMock__factory(deployer).deploy();
     tracer.nameTags[delegateServiceRegistry.address] = "Delegate Service Registry";
 
   });
@@ -69,22 +74,22 @@ describe("Delegate Service Registry", function () {
   /*                          SECTION Testing Messenger                         */
   /* -------------------------------------------------------------------------- */
 
-  describe("MessengerDelegateService", function () {
+  describe("DelegateServiceRegistry", function () {
 
     describe("MessengerDelegateService", function () {
 
       describe("Messenger", function () {
 
         describe("Validate interface and function selector computation", function () {
-          it("IMessengerInterfaceId.", async function () {
+          it("IDelegateServiceRegistryInterfaceId.", async function () {
             expect(await messengerDelegateService.IMessengerInterfaceId())
               .to.equal(IMessengerInterfaceId);
           });
-          it("setMessageFunctionSelector.", async function () {
+          it("queryDelegateServiceAddressFunctionSelector.", async function () {
             expect(await messengerDelegateService.setMessageFunctionSelector())
               .to.equal(setMessageFunctionSelector);
           });
-          it("getMessageFunctionSelector.", async function () {
+          it("bulkQueryDelegateServiceAddressFunctionSelector.", async function () {
             expect(await messengerDelegateService.getMessageFunctionSelector())
               .to.equal(getMessageFunctionSelector);
           });
@@ -137,6 +142,22 @@ describe("Delegate Service Registry", function () {
 
       describe("DelegateServiceRegistry", function () {
 
+        describe("Validate interface and function selector computation", function () {
+          it("IMessengerInterfaceId.", async function () {
+            expect(await delegateServiceRegistry.IDelegateServiceRegistryInterfaceId())
+              .to.equal(IDelegateServiceRegistryInterfaceId);
+          });
+          it("setMessageFunctionSelector.", async function () {
+            expect(await delegateServiceRegistry.queryDelegateServiceAddressFunctionSelector())
+              .to.equal(queryDelegateServiceAddressFunctionSelector);
+          });
+          it("getMessageFunctionSelector.", async function () {
+            expect(await delegateServiceRegistry.bulkQueryDelegateServiceAddressFunctionSelector())
+              .to.equal(bulkQueryDelegateServiceAddressFunctionSelector);
+          });
+
+        });
+
         describe("#queryDelegateServiceAddress()", function () {
           describe("(bytes4)", function () {
             it("Accurately reports MessengerDelegateService", async function () {
@@ -146,6 +167,34 @@ describe("Delegate Service Registry", function () {
               );
               expect(await delegateServiceRegistry.queryDelegateServiceAddress(IMessengerInterfaceId))
                 .to.equal(messengerDelegateService.address);
+            });
+          });
+        });
+
+        describe("#bulkQueryDelegateServiceAddress()", function () {
+          describe("(bytes4[])", function () {
+            it("Accurately reports MessengerDelegateService", async function () {
+              await delegateServiceRegistry.registerDelegateService(
+                IDelegateServiceRegistryInterfaceId,
+                delegateServiceRegistry.address
+              );
+              await delegateServiceRegistry.registerDelegateService(
+                IMessengerInterfaceId,
+                messengerDelegateService.address
+              );
+              expect(
+                await delegateServiceRegistry.bulkQueryDelegateServiceAddress(
+                  [
+                    IMessengerInterfaceId,
+                    IDelegateServiceRegistryInterfaceId
+                  ]
+                )
+              ).to.have.members(
+                [
+                  messengerDelegateService.address,
+                  delegateServiceRegistry.address
+                ]
+              );
             });
           });
         });

@@ -38,6 +38,13 @@ library UInt256CounterUtils {
       ^ UInt256Utils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   /**
    * @notice Could be optimized by having the exposing interface caclulate and store
    *  the storage slot as a constant.
@@ -45,10 +52,14 @@ library UInt256CounterUtils {
    *  standardization.
    */
   function _layout( bytes32 salt ) pure internal returns ( UInt256Counter.Layout storage layout ) {
-    bytes32 saltedSlot =
-      salt
-      ^ UInt256CounterUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
+  }
+
+  function _current(
+    UInt256Counter.Layout storage layout
+  ) view internal returns (uint256 currentCount) {
+    currentCount = layout.count._getValue();
   }
 
   function _next(

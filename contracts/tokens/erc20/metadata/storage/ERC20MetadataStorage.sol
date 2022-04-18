@@ -23,6 +23,8 @@ library ERC20MetadataStorage {
 library ERC20MetadataUtils {
 
   using ERC20MetadataUtils for ERC20MetadataStorage.Layout;
+  using UInt8Utils for UInt8.Layout;
+  using StringUtils for String.Layout;
 
   bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(ERC20MetadataStorage).creationCode);
 
@@ -32,10 +34,15 @@ library ERC20MetadataUtils {
       ^ StringUtils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   function _layout(bytes32 salt) pure internal returns (ERC20MetadataStorage.Layout storage layout) {
-    bytes32 saltedSlot =
-      salt
-      ^ ERC20MetadataUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 
@@ -43,39 +50,39 @@ library ERC20MetadataUtils {
     ERC20MetadataStorage.Layout storage layout,
     string memory name
   ) internal {
-    layout.name.value = name;
+    layout.name._setValue(name);
   }
 
   function _getName(
     ERC20MetadataStorage.Layout storage layout
   ) view internal returns (string memory name) {
-    name = layout.name.value;
+    name = layout.name._getValue();
   }
 
   function _setSymbol(
     ERC20MetadataStorage.Layout storage layout,
     string memory symbol
   ) internal {
-    layout.symbol.value = symbol;
+    layout.symbol._setValue(symbol);
   }
 
   function _getSymbol(
     ERC20MetadataStorage.Layout storage layout
   ) view internal returns (string memory symbol) {
-    symbol = layout.symbol.value;
+    symbol = layout.symbol._getValue();
   }
 
   function _setDecimals(
     ERC20MetadataStorage.Layout storage layout,
     uint8 decimals
   ) internal {
-    layout.decimals.value = decimals;
+    layout.decimals._setValue(decimals);
   }
 
   function _getDecimals(
     ERC20MetadataStorage.Layout storage layout
   ) view internal returns (uint8 decimals) {
-    decimals = layout.decimals.value;
+    decimals = layout.decimals._getValue();
   }
   
 }

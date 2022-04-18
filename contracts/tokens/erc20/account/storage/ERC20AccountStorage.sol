@@ -27,6 +27,9 @@ library ERC20AccountStorage {
 library ERC20AccountUtils {
 
   using ERC20AccountUtils for ERC20AccountStorage.Layout;
+  using UInt256Utils for UInt256.Layout;
+  using AddressToUInt256Utils for AddressToUInt256.Layout;
+  using AddressToAddressToUInt256Utils for AddressToAddressToUInt256.Layout;
 
   bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(ERC20AccountStorage).creationCode);
 
@@ -37,10 +40,15 @@ library ERC20AccountUtils {
       ^ AddressToAddressToUInt256Utils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   function _layout(bytes32 salt) pure internal returns (ERC20AccountStorage.Layout storage layout) {
-    bytes32 saltedSlot =
-      salt
-      ^ ERC20AccountUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 
@@ -48,13 +56,13 @@ library ERC20AccountUtils {
     ERC20AccountStorage.Layout storage layout,
     uint256 newTotalSupply
   ) internal {
-    layout.totalSupply.value = newTotalSupply;
+    layout.totalSupply._setValue(newTotalSupply);
   }
 
   function _getTotalSupply(
     ERC20AccountStorage.Layout storage layout
   ) view internal returns (uint256 totalSupply) {
-    totalSupply = layout.totalSupply.value;
+    totalSupply = layout.totalSupply._getValue();
   }
 
   function _setBalance(
@@ -62,14 +70,14 @@ library ERC20AccountUtils {
     address account,
     uint256 newBalance
   ) internal {
-    layout.balanceForAccount.value[account].value = newBalance;
+    layout.balanceForAccount._mapValue(account, newBalance);
   }
 
   function _getBalance(
     ERC20AccountStorage.Layout storage layout,
     address accountQuery
   ) view internal returns (uint256 balance) {
-    balance = layout.balanceForAccount.value[accountQuery].value;
+    balance = layout.balanceForAccount._queryValue(accountQuery);
   }
 
   function _setApproval(
@@ -78,7 +86,7 @@ library ERC20AccountUtils {
     address spender,
     uint256 newLimit
   ) internal {
-    layout.approvalAmountForSpenderForAccount.value[account][spender].value = newLimit;
+    layout.approvalAmountForSpenderForAccount._mapValue(account, spender, newLimit);
   }
 
   function _getApproval(
@@ -86,7 +94,7 @@ library ERC20AccountUtils {
     address accountQuery,
     address spenderQuery
   ) view internal returns (uint256 limit) {
-    limit = layout.approvalAmountForSpenderForAccount.value[accountQuery][spenderQuery].value;
+    limit = layout.approvalAmountForSpenderForAccount._queryValue(accountQuery, spenderQuery);
   }
   
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {
   Bytes4Set,
   Bytes4SetUtils
-} from "../../../types/collections/sets/Bytes4Set.sol";
+} from "contracts/types/collections/sets/Bytes4Set.sol";
 
 library ERC165Storage {
 
@@ -14,10 +14,6 @@ library ERC165Storage {
     Bytes4Set.Layout supportedInterfaces;
   }
 
-  function _layout(bytes32 slot) internal pure returns (Layout storage layout) {
-    assembly { layout.slot := slot }
-  }
-
 }
 
 library ERC165Utils {
@@ -25,14 +21,23 @@ library ERC165Utils {
   using Bytes4SetUtils for Bytes4Set.Enumerable;
   // using ERC165Lib for ERC165Storage.Layout;
 
-  bytes32 private constant STORAGE_SLOT = keccak256(type(ERC165Storage).creationCode);
+  bytes32 private constant STRUCT_STORAGE_SLOT = keccak256(type(ERC165Storage).creationCode);
 
-  function _getDefaultSlot() internal pure returns ( bytes32 defaultSlot ) {
-    defaultSlot = STORAGE_SLOT;
+  function _structSlot() pure internal returns (bytes32 structSlot) {
+    structSlot = STRUCT_STORAGE_SLOT
+      ^ Bytes4SetUtils._structSlot();
   }
 
-  function _layout( bytes32 slot ) internal pure returns (ERC165Storage.Layout storage layout) {
-    layout = ERC165Storage._layout(slot);
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
+  function _layout( bytes32 salt ) pure internal returns ( ERC165Storage.Layout storage layout ) {
+    bytes32 saltedSlot = _saltStorageSlot(salt);
+    assembly{ layout.slot := saltedSlot }
   }
 
   function _isSupportedInterface(

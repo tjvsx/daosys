@@ -2,13 +2,9 @@
 pragma solidity ^0.8.0;
 
 import {
-  IERC165,
-  ERC165Internal,
-  ERC165Utils,
-  ERC165Storage,
-  Bytes4Set,
-  Bytes4SetUtils
-} from './internal/ERC165Internal.sol';
+  ERC165Logic
+} from 'contracts/introspection/erc165/logic/ERC165Logic.sol';
+import {IERC165} from "contracts/introspection/erc165/interfaces/IERC165.sol";
 // import {ERC165Lib, ERC165Storage} from './libraries/ERC165Lib.sol';
 
 /**
@@ -17,26 +13,32 @@ import {
 abstract contract ERC165
   is 
     IERC165,
-    ERC165Internal
+    ERC165Logic
 {
-
-  // using Bytes4SetUtils for Bytes4Set.Enumerable;
-  using ERC165Utils for ERC165Storage.Layout;
 
   constructor() {
     ERC165._erc165Init();
   }
 
   function _erc165Init() internal {
-    ERC165Internal._setSupportedInterface(type(IERC165).interfaceId);
+    _setSupportedInterface(
+        type(IERC165).interfaceId,
+        type(IERC165).interfaceId
+      );
   }
 
-  function _initERC165(bytes4 interfaceId) virtual internal {
-    ERC165Internal._setSupportedInterface(interfaceId);
+  function _configERC165(bytes4 interfaceId) virtual internal {
+    _setSupportedInterface(
+        type(IERC165).interfaceId,
+        interfaceId
+      );
   }
 
-  function supportsInterface(bytes4 interfaceId) override virtual external view returns (bool) {
-    return ERC165Internal._isSupportedInterface(interfaceId);
+  function supportsInterface(bytes4 interfaceId) override virtual external view returns (bool isSupported) {
+    isSupported = _isSupportedInterface(
+        type(IERC165).interfaceId,
+        interfaceId
+      );
   }
   
 }

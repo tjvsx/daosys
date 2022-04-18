@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.0;
 
-import {MinimalProxyFactoryInternal} from '../internal/MinimalProxyFactoryInternal.sol';
+import {MinimalProxyFactoryLogic} from "contracts/factories/proxy/minimal/logic/MinimalProxyFactoryLogic.sol";
 
-contract MinimalProxyFactoryMock is MinimalProxyFactoryInternal {
+contract MinimalProxyFactoryMock is MinimalProxyFactoryLogic {
   function __deployMinimalProxy(address target) external returns (address minimalProxy) {
     return _deployMinimalProxy(target);
   }

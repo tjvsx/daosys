@@ -17,6 +17,7 @@ library ERC20UFragmentsStorage {
 library ERC20UFragmentsUtils {
 
   using ERC20UFragmentsUtils for ERC20UFragmentsStorage.Layout;
+  using UInt256Utils for UInt256.Layout;
 
   bytes32 constant private STRUCT_STORAGE_SLOT = keccak256(type(ERC20UFragmentsStorage).creationCode);
 
@@ -41,10 +42,15 @@ library ERC20UFragmentsUtils {
       ^ UInt256Utils._structSlot();
   }
 
+  function _saltStorageSlot(
+    bytes32 storageSlotSalt
+  ) pure internal returns (bytes32 saltedStorageSlot) {
+    saltedStorageSlot = storageSlotSalt
+      ^ _structSlot();
+  }
+
   function _layout(bytes32 salt) pure internal returns (ERC20UFragmentsStorage.Layout storage layout) {
-    bytes32 saltedSlot =
-      salt
-      ^ ERC20UFragmentsUtils._structSlot();
+    bytes32 saltedSlot = _saltStorageSlot(salt);
     assembly{ layout.slot := saltedSlot }
   }
 
@@ -55,14 +61,14 @@ library ERC20UFragmentsUtils {
   function _getBaseAmountPerFragment(
     ERC20UFragmentsStorage.Layout storage layout
   ) view internal returns (uint256 baseAmountPerFragment) {
-    baseAmountPerFragment = layout.baseAmountPerFragment.value;
+    baseAmountPerFragment = layout.baseAmountPerFragment._getValue();
   }
 
   function _setBaseAmountPerFragment(
     ERC20UFragmentsStorage.Layout storage layout,
     uint256 newBaseAmountPerFragment
   ) internal {
-    layout.baseAmountPerFragment.value = newBaseAmountPerFragment;
+    layout.baseAmountPerFragment._setValue(newBaseAmountPerFragment);
   }
 
 }
