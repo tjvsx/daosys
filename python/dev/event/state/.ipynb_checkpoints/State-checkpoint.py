@@ -1,15 +1,15 @@
 import copy
 from python.dev.math.interest import Yield
 
-class Record():
-    def __init__(self, event, time0=None):
+class State():
+    def __init__(self, event):
         self.__event = event
         self.__tn = None
         self.__balance = 0
         self.__principle = 0
         self.__yield = 0
   
-    def init_first_record(self, t0):
+    def init_first_state(self, t0):
         self.__tn = t0
 
     def get_balance(self):
