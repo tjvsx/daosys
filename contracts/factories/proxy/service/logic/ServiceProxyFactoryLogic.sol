@@ -10,7 +10,6 @@ abstract contract ServiceProxyFactoryLogic {
   
   using ServiceProxyFactoryStorageUtils for ServiceProxyFactoryStorage.Layout;
 
-
   function _setDelegateServiceRegistry(
     bytes32 storageSlotSalt,
     address delegateServiceRegistry

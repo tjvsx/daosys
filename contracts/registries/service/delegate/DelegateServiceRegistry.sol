@@ -7,6 +7,9 @@ import {
 import {
   IDelegateServiceRegistry
 } from "contracts/registries/service/delegate/interfaces/IDelegateServiceRegistry.sol";
+import {
+  IDelegateService
+} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
 contract DelegateServiceRegistry
   is
@@ -17,12 +20,29 @@ contract DelegateServiceRegistry
   function registerDelegateService(
     bytes4 delegateServiceInterfaceId,
     address delegateServiceAddress
-  ) external {
+  ) external returns (bool success) {
     _registerDelegateService(
-        type(IDelegateServiceRegistry).interfaceId,
-        delegateServiceInterfaceId,
-        delegateServiceAddress
-      );
+      type(IDelegateServiceRegistry).interfaceId,
+      delegateServiceInterfaceId,
+      delegateServiceAddress
+    );
+    success = true;
+  }
+
+  // TODO Add Address Based Implicit ACL
+  function selfRegisterDelegateService(
+    address delegateServiceAddress
+  ) external returns (bool success) {
+
+    IDelegateService.ServiceDef memory serviceDef = IDelegateService(delegateServiceAddress)
+      .getServiceDef();
+
+    _registerDelegateService(
+      type(IDelegateServiceRegistry).interfaceId,
+      serviceDef.interfaceId,
+      delegateServiceAddress
+    );
+    success = true;
   }
 
   function queryDelegateServiceAddress(

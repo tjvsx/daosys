@@ -5,14 +5,16 @@ pragma solidity ^0.8.0;
 /*                       SECTION DelegateServiceFactory                       */
 /* -------------------------------------------------------------------------- */
 
-// interface IDelegateServiceFactory {
+interface IDelegateServiceFactory {
 
-//   function deployDelegateService(
-//     bytes memory delegateServiceCreationCode,
-//     bytes32 delegateServiceInterfaceId
-//   ) external returns (address delegateService);
+  function deployDelegateService(
+    bytes memory delegateServiceCreationCode,
+    bytes32 delegateServiceInterfaceId
+  ) external returns (address delegateService);
 
-// }
+  function getDelegateServiceRegistry() view external returns (address delegateServiceRegistry);
+
+}
 /* -------------------------------------------------------------------------- */
 /*                       !SECTION DelegateServiceFactory                      */
 /* -------------------------------------------------------------------------- */

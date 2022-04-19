@@ -6,14 +6,14 @@ import {
   FactoryUtils
 } from "../../../libraries/FactoryUtils.sol";
 
-// library DelegateServiceFactoryUtils {
+library DelegateServiceFactoryUtils {
 
 
-//   function _deployDelegateService(
-//     bytes memory delegateServiceCreationCode,
-//     bytes32 delegateServiceInterfaceId
-//   ) internal returns (address delegateService) {
-//     delegateService = FactoryUtils._deployWithSalt(delegateServiceCreationCode, delegateServiceInterfaceId);
-//   }
+  function _deployDelegateService(
+    bytes memory delegateServiceCreationCode,
+    bytes32 delegateServiceInterfaceId
+  ) internal returns (address delegateService) {
+    delegateService = FactoryUtils._deployWithSalt(delegateServiceCreationCode, delegateServiceInterfaceId);
+  }
   
-// }
+}

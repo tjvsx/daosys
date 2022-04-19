@@ -22,7 +22,6 @@ describe("Delegate Service Registry", function () {
 
   // TestService test variables
   let messengerDelegateService: MessengerDelegateService;
-
   const IDelegateServiceInterfaceId = '0xd56eb69e';
   const getServiceDefFunctionSelector = '0xd56eb69e';
   const IMessengerInterfaceId = "0xf8e6c6ac";
@@ -30,7 +29,6 @@ describe("Delegate Service Registry", function () {
   const getMessageFunctionSelector = '0xce6d41de';
 
   let delegateServiceRegistry: DelegateServiceRegistryMock;
-
   const IDelegateServiceRegistryInterfaceId = '0xb0184e40';
   const queryDelegateServiceAddressFunctionSelector = '0x03714859';
   const bulkQueryDelegateServiceAddressFunctionSelector = '0xb3690619';
@@ -143,15 +141,15 @@ describe("Delegate Service Registry", function () {
       describe("DelegateServiceRegistry", function () {
 
         describe("Validate interface and function selector computation", function () {
-          it("IMessengerInterfaceId.", async function () {
+          it("IDelegateServiceRegistryInterfaceId.", async function () {
             expect(await delegateServiceRegistry.IDelegateServiceRegistryInterfaceId())
               .to.equal(IDelegateServiceRegistryInterfaceId);
           });
-          it("setMessageFunctionSelector.", async function () {
+          it("queryDelegateServiceAddressFunctionSelector.", async function () {
             expect(await delegateServiceRegistry.queryDelegateServiceAddressFunctionSelector())
               .to.equal(queryDelegateServiceAddressFunctionSelector);
           });
-          it("getMessageFunctionSelector.", async function () {
+          it("bulkQueryDelegateServiceAddressFunctionSelector.", async function () {
             expect(await delegateServiceRegistry.bulkQueryDelegateServiceAddressFunctionSelector())
               .to.equal(bulkQueryDelegateServiceAddressFunctionSelector);
           });
