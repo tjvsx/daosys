@@ -6,7 +6,7 @@ class Deposit(Event):
         self.__t_delta = t_delta
         self.__delta = delta
         self.__apy = apy
-        self.__address = address
+        self.__address = address if address != None else address
         
     def get_time_delta(self):
         return self.__t_delta
