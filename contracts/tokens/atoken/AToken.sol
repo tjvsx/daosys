@@ -3,13 +3,13 @@ pragma solidity 0.8.9;
 
 import {IERC20} from "../erc20/interfaces/IERC20.sol";
 import {SafeERC20} from "../erc20/utils/SafeERC20.sol";
-import {ILendingPool} from '../../interfaces/ILendingPool.sol';
-import {IAToken} from '../../interfaces/IAToken.sol';
-import {WadRayMath} from '../libraries/math/WadRayMath.sol';
-import {Errors} from '../libraries/helpers/Errors.sol';
-import {VersionedInitializable} from '../libraries/aave-upgradeability/VersionedInitializable.sol';
-import {IncentivizedERC20} from './IncentivizedERC20.sol';
-import {IAaveIncentivesController} from '../../interfaces/IAaveIncentivesController.sol';
+import {ILendingPool} from "../interfaces/ILendingPool.sol";
+import {IAToken} from "../interfaces/IAToken.sol";
+import {WadRayMath} from "../libraries/math/WadRayMath.sol";
+import {Errors} from "../libraries/helpers/Errors.sol";
+import {VersionedInitializable} from "../libraries/aave-upgradeability/VersionedInitializable.sol";
+import {IncentivizedERC20} from "./IncentivizedERC20.sol";
+import {IAaveIncentivesController} from "../interfaces/IAaveIncentivesController.sol";
 
 /**
  * @title Aave ERC20 AToken
