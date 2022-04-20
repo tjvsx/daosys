@@ -6,48 +6,38 @@
 
 pragma solidity ^0.8.0;
 
-// import {
-//   DelegateServiceFactoryInternal
-// } from "./internal/DelegateServiceFactoryInternal.sol";
-// import {
-//   IDelegateService,
-//   DelegateService
-// } from "../../../service/delegate/DelegateService.sol";
-// import {IDelegateServiceFactory} from "./interfaces/IDelegateServiceFactory.sol";
-// import {
-//   IDelegateServiceRegistry,
-//   DelegateServiceRegistryInternal,
-//   DelegateServiceRegistryUtils,
-//   DelegateServiceRegistryStorage
-// } from "../../../registries/service/delegate/internal/DelegateServiceRegistryInternal.sol";
+import {
+  DelegateServiceFactoryLogic
+} from "contracts/factories/service/delegate/logic/DelegateServiceFactoryLogic.sol";
+import {
+  IDelegateServiceFactory
+} from "contracts/factories/service/delegate/interfaces/IDelegateServiceFactory.sol";
+import {
+  IDelegateServiceRegistry
+} from "contracts/registries/service/delegate/interfaces/IDelegateServiceRegistry.sol";
+import {
+  IDelegateService
+} from "contracts/service/delegate/interfaces/IDelegateService.sol";
 
-// contract DelegateServiceFactory
-//   is
-//     DelegateServiceFactoryInternal,
-//     DelegateService
-// {
+contract DelegateServiceFactory
+  is
+    DelegateServiceFactoryLogic
+{
 
-//   using DelegateServiceRegistryUtils for DelegateServiceRegistryStorage.Layout;
+  // TODO Restrict to Ownable
+  // TODO Implement RBAC NFT
+  function deployDelegateService(
+    bytes memory delegateServiceCreationCode,
+    bytes32 delegateServiceInterfaceId
+  ) external returns (address delegateService) {
+    delegateService = _deployDelegateService(delegateServiceCreationCode, delegateServiceInterfaceId);
+  }
 
-//   constructor() DelegateService() {
-//     bytes4[] memory delegateServiceFunctions = new bytes4[](1);
-//     delegateServiceFunctions[0] = IDelegateServiceFactory.deployDelegateService.selector;
-//     _publishDelegateServiceSelf(
-//       type(IDelegateServiceFactory).interfaceId,
-//       delegateServiceFunctions
-//     );
-//   }
+  function getDelegateServiceRegistry() view external returns (address delegateServiceRegistry) {
+    delegateServiceRegistry = _getDelegateServiceRegistry(type(IDelegateServiceFactory).interfaceId);
+  }
 
-//   // TODO Restrict to Ownable
-//   // TODO Implement RBAC NFT
-//   function deployDelegateService(
-//     bytes memory delegateServiceCreationCode,
-//     bytes32 delegateServiceInterfaceId
-//   ) external returns (address delegateService) {
-//     delegateService = _deployDelegateService(delegateServiceCreationCode, delegateServiceInterfaceId);
-//   }
-
-// }
+}
 /* -------------------------------------------------------------------------- */
 /*                       !SECTION DelegateServiceFactory                      */
 /* -------------------------------------------------------------------------- */
