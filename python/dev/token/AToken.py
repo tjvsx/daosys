@@ -14,7 +14,7 @@ class AToken(Token):
     def get_state_map(self):
         return self.__state_map
 
-    def get_state_series(self,address):
+    def get_state_series(self, address):
         return self.__state_map.get_states(address)
     
     def init_token(self, time0, address):

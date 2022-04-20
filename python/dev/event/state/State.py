@@ -28,11 +28,11 @@ class State():
         return self.__event       
     
     def update_event(self, event):
+        self.__event = copy.copy(event) 
         self.update_timestamp()
         self.update_balance()  
         self.update_principle()
-        self.__event = copy.copy(event) 
-   
+       
     def update_timestamp(self):
         self.__tn = self.__tn + self.__event.get_time_delta()
 
