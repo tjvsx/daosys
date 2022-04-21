@@ -4,7 +4,7 @@ from python.dev.event.state import State
 from python.dev.token import Token
 from python.dev.event import Deposit
 
-class AToken(Token):
+class RebaseToken(Token):
     
     def __init__(self, name, supply = None, addresses = None):
         super().__init__(name, None, None)
