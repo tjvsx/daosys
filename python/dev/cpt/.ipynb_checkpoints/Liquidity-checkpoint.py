@@ -15,8 +15,8 @@ class Liquidity():
     def __init__(self, x_real, y_real):
         self.__x_real = x_real
         self.__y_real = y_real
-        self.__new_x = 0
-        self.__new_y = 0        
+        self.__x_new = 0
+        self.__y_new = 0        
  
     def get_x_real(self):
         return self.__x_real
