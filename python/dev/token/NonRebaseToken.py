@@ -18,7 +18,7 @@ class NonRebaseToken(Token):
         return self.__state_map.get_states(address)
     
     def init_token(self, time0, address):
-        self.__state = State(Deposit(0,0,0))
+        self.__state = State(Deposit(0,0,0), False)
         self.__state.init_first_state(time0)
  
     def add_event(self, event):
