@@ -14,13 +14,17 @@ class Liquidity():
     
     def __init__(self, x_real, y_real):
         self.__x_real = x_real
-        self.__y_real = y_real     
- 
+        self.__y_real = y_real  
+        self.__swap_price = None 
+        
     def get_x_real(self):
         return self.__x_real
 
     def get_y_real(self):
         return self.__y_real
+    
+    def get_swap_price(self): 
+        return self.__swap_price    
         
     def set_y_real(self, y_real):
         self.__y_real = y_real
@@ -39,13 +43,15 @@ class Liquidity():
 
     def calc_delta_x(self, delta_y):
         return (self.__x_real*delta_y)/(self.__y_real+delta_y)
-  
-    def calc(self):    
+
+    def calc(self): 
+        self.__swap_price = self.__y_real / self.__x_real
         return np.sqrt(self.__x_real*self.__y_real)    
          
     def swap(self, delta_x):
         
         delta_y = self.calc_delta_y(delta_x)
+        self.__swap_price = delta_y / delta_x
         self.__x_real = (self.__x_real+delta_x)
         self.__y_real = (self.__y_real-delta_y)      
          
