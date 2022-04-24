@@ -345,7 +345,7 @@ contract AToken is
     require(owner != address(0), 'INVALID_OWNER');
     //solium-disable-next-line
     require(block.timestamp <= deadline, 'INVALID_EXPIRATION');
-    uint256 currentValidNonce = _nonces[owner];
+    uint currentValidNonce = _nonces[owner];
     bytes32 digest =
       keccak256(
         abi.encodePacked(

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.6.12;
+pragma solidity 0.8.9;
 
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Detailed} from "@openzeppelin/contracts/interfaces/IERC20Detailed.sol";
+import {IERC20Detailed} from "./interfaces/IERC20Detailed.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import {IAaveIncentivesController} from "./interfaces/IAaveIncentivesController.sol";
 
@@ -12,7 +12,7 @@ import {IAaveIncentivesController} from "./interfaces/IAaveIncentivesController.
  * @notice Basic ERC20 implementation
  * @author Aave, inspired by the Openzeppelin ERC20 implementation
  **/
-abstract contract IncentivizedERC20 is Context, IERC20, IERC20Detailed {
+abstract contract IncentivizedERC20 is Context, IERC20Detailed {
   using SafeMath for uint256;
 
   mapping(address => uint256) internal _balances;
@@ -27,7 +27,7 @@ abstract contract IncentivizedERC20 is Context, IERC20, IERC20Detailed {
     string memory name,
     string memory symbol,
     uint8 decimals
-  ) public {
+  ) {
     _name = name;
     _symbol = symbol;
     _decimals = decimals;
