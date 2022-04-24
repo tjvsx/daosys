@@ -35,7 +35,7 @@ contract DelegateServiceFactory
     bytes32 delegateServiceInterfaceId
   ) external returns (address delegateService) {
     delegateService = _deployDelegateService(delegateServiceCreationCode, delegateServiceInterfaceId);
-    require( IDelegateService(delegateService).registerDelegateService(), "DSFactory: DS registration failed." );
+    require( IDelegateService(delegateService).registerDelegateService(delegateServiceInterfaceId), "DSFactory: DS registration failed." );
   }
 
   function getDelegateServiceRegistry() view external returns (address delegateServiceRegistry) {

@@ -300,8 +300,22 @@ describe('Delegate Service Factory', function () {
           );
           expect(serviceProxyMetadata.deployerAddress).to.equal(serviceProxyFactory.address);
 
+          const newMessengerDSMetadata = await newMessengerDS.getCreate2DeploymentMetadata();
+
+          expect(newMessengerDSMetadata.deploymentSalt).to.equal(
+            await serviceProxyFactory.calculateDeploymentSalt(
+              ethers.constants.AddressZero,
+              [
+                await messengerDelegateService.IMessengerInterfaceId()
+              ]
+            )
+          );
+          expect(newMessengerDSMetadata.deployerAddress).to.equal(delegateServiceFactory.address);
+
           await newServiceProxyAsMessenger.setMessage("Hello World!");
           expect(await newServiceProxyAsMessenger.getMessage()).to.equal("Hello World!");
+
+
 
         });
       });
