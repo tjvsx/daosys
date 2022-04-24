@@ -6,13 +6,13 @@ library Create2Utils {
   /**
    * @notice calculate the _deployMetamorphicContract deployment address for a given salt
    * @param creationCodeHash hash of contract creation code
-   * @param salt input for deterministic address calculation
+   * @param deploymentSalt input for deterministic address calculation
    * @return deploymentAddress Calculated deployment address
    */
   function _calculateDeploymentAddress(
     address deployerAddress,
     bytes32 creationCodeHash,
-    bytes32 salt
+    bytes32 deploymentSalt
   ) pure internal returns (address deploymentAddress) {
     deploymentAddress = address(
       uint160(
@@ -21,7 +21,7 @@ library Create2Utils {
             abi.encodePacked(
               hex'ff',
               deployerAddress,
-              salt,
+              deploymentSalt,
               creationCodeHash
             )
           )

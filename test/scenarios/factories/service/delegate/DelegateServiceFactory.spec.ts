@@ -48,10 +48,12 @@ describe('Delegate Service Factory', function () {
 
   // Service Proxy test variables
   let proxy: ServiceProxyMock;
-  const IServiceProxyInterfaceId = '0x26ddf639';
+  const IServiceProxyInterfaceId = '0x805cef69';
   const getImplementationFunctionSelector = '0xdc9cc645';
   const initializeServiceProxyFunctionSelector = '0x5cc0292c';
-  const getDeploymentMetadataFunctionSelector = '0xa6811950';
+
+  const ICreate2DeploymentMetadataInterfaceId = '0x2e08c21c';
+  const getCreate2DeploymentMetadataFunctionSelector = '0x2e08c21c';
 
   let proxyAsMessenger: MessengerDelegateService;
   let newServiceProxyAsMessenger: MessengerDelegateService;
@@ -187,9 +189,13 @@ describe('Delegate Service Factory', function () {
           expect(await proxy.initializeServiceProxyFunctionSelector())
             .to.equal(initializeServiceProxyFunctionSelector);
         });
-        it("getDeploymentMetadataFunctionSelector.", async function () {
-          expect(await proxy.getDeploymentMetadataFunctionSelector())
-            .to.equal(getDeploymentMetadataFunctionSelector);
+        it("ICreate2DeploymentMetadataInterfaceId.", async function () {
+          expect(await proxy.ICreate2DeploymentMetadataInterfaceId())
+            .to.equal(ICreate2DeploymentMetadataInterfaceId);
+        });
+        it("getCreate2DeploymentMetadataFunctionSelector.", async function () {
+          expect(await proxy.getCreate2DeploymentMetadataFunctionSelector())
+            .to.equal(getCreate2DeploymentMetadataFunctionSelector);
         });
       });
 
@@ -282,7 +288,7 @@ describe('Delegate Service Factory', function () {
           newServiceProxy = await ethers.getContractAt("ServiceProxyMock", newServiceProxyAddress) as ServiceProxyMock;
           tracer.nameTags[newServiceProxyAsMessenger.address] = "ServiceProxyAsMessenger";
 
-          const serviceProxyMetadata = await newServiceProxy.getDeploymentMetadata();
+          const serviceProxyMetadata = await newServiceProxy.getCreate2DeploymentMetadata();
 
           expect(serviceProxyMetadata.deploymentSalt).to.equal(
             await serviceProxyFactory.calculateDeploymentSalt(
@@ -292,7 +298,7 @@ describe('Delegate Service Factory', function () {
               ]
             )
           );
-          expect(serviceProxyMetadata.proxyFactoryAddress).to.equal(serviceProxyFactory.address);
+          expect(serviceProxyMetadata.deployerAddress).to.equal(serviceProxyFactory.address);
 
           await newServiceProxyAsMessenger.setMessage("Hello World!");
           expect(await newServiceProxyAsMessenger.getMessage()).to.equal("Hello World!");
