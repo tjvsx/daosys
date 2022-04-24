@@ -30,9 +30,9 @@ describe("ServiceProxyFactory", function () {
 
   // Messenger Delegate Service test variables
   let messengerDelegateService: MessengerDelegateService;
-  const IDelegateServiceInterfaceId = '0xd56eb69e';
+  const IDelegateServiceInterfaceId = '0x46b24a8b';
   const getServiceDefFunctionSelector = '0xd56eb69e';
-  const IMessengerInterfaceId = "0xf8e6c6ac";
+  const IMessengerInterfaceId = '0xf8e6c6ac';
   const setMessageFunctionSelector = '0x368b8772';
   const getMessageFunctionSelector = '0xce6d41de';
 
@@ -46,7 +46,7 @@ describe("ServiceProxyFactory", function () {
   let proxyAsMessenger: MessengerDelegateService;
 
   let delegateServiceRegistry: DelegateServiceRegistryMock;
-  const IDelegateServiceRegistryInterfaceId = '0xb0184e40';
+  const IDelegateServiceRegistryInterfaceId = '0x1fd72ff4';
   const queryDelegateServiceAddressFunctionSelector = '0x03714859';
   const bulkQueryDelegateServiceAddressFunctionSelector = '0xb3690619';
 
@@ -113,7 +113,7 @@ describe("ServiceProxyFactory", function () {
 
   describe("ServiceProxyFactory", function () {
 
-    describe("::MessengerDelegateService", function () {
+    describe("MessengerDelegateService", function () {
 
       describe("Messenger", function () {
 
@@ -144,7 +144,7 @@ describe("ServiceProxyFactory", function () {
 
       });
 
-      describe("DelegateService", function () {
+      describe("DelegateServiceMock", function () {
 
         describe("Validate interface and function selector computation", function () {
           it("IDelegateServiceInterfaceId.", async function () {
@@ -179,7 +179,7 @@ describe("ServiceProxyFactory", function () {
 
     });
 
-    describe("ServiceProxy", function () {
+    describe("ServiceProxyMock", function () {
 
       describe("Validate interface and function selector computation", function () {
         it("IServiceProxyInterfaceId.", async function () {
@@ -240,18 +240,18 @@ describe("ServiceProxyFactory", function () {
 
     });
 
-    describe("DelegateServiceRegistry", function () {
+    describe("DelegateServiceRegistryMock", function () {
 
       describe("Validate interface and function selector computation", function () {
-        it("IMessengerInterfaceId.", async function () {
+        it("IDelegateServiceRegistryInterfaceId.", async function () {
           expect(await delegateServiceRegistry.IDelegateServiceRegistryInterfaceId())
             .to.equal(IDelegateServiceRegistryInterfaceId);
         });
-        it("setMessageFunctionSelector.", async function () {
+        it("queryDelegateServiceAddressFunctionSelector.", async function () {
           expect(await delegateServiceRegistry.queryDelegateServiceAddressFunctionSelector())
             .to.equal(queryDelegateServiceAddressFunctionSelector);
         });
-        it("getMessageFunctionSelector.", async function () {
+        it("bulkQueryDelegateServiceAddressFunctionSelector.", async function () {
           expect(await delegateServiceRegistry.bulkQueryDelegateServiceAddressFunctionSelector())
             .to.equal(bulkQueryDelegateServiceAddressFunctionSelector);
         });

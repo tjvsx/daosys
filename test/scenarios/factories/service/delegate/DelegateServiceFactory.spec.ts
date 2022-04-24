@@ -17,7 +17,7 @@ import {
   ServiceProxyFactoryMock__factory
 } from '../../../../../typechain';
 
-describe.only('Delegate Service Factory', function () {
+describe('Delegate Service Factory', function () {
 
   // Control values for tests
   const invalidInterfaceId = "0xffffffff";
