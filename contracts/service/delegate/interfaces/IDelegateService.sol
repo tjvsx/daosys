@@ -10,6 +10,8 @@ interface IDelegateService {
     bytes4 bootstrapperInitFunction;
   }
 
+  function registerDelegateService() external returns (bool success);
+
   function getServiceDef() view external returns (ServiceDef memory serviceDef);
   
 }

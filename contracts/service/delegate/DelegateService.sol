@@ -7,6 +7,10 @@ import {
   DelegateServiceStorageUtils
 } from "contracts/service/delegate/logic/DelegateServiceLogic.sol";
 import {IDelegateService} from "contracts/service/delegate/interfaces/IDelegateService.sol";
+import {IDelegateServiceFactory} from "contracts/factories/service/delegate/interfaces/IDelegateServiceFactory.sol";
+import {
+  IDelegateServiceRegistry
+} from "contracts/registries/service/delegate/interfaces/IDelegateServiceRegistry.sol";
 
 abstract contract DelegateService is IDelegateService, DelegateServiceLogic {
 
@@ -22,9 +26,15 @@ abstract contract DelegateService is IDelegateService, DelegateServiceLogic {
       type(IDelegateService).interfaceId,
       interfaceId,
       functionSelectors,
-        bootstrapper,
-        bootstrapperInitFunction
+      bootstrapper,
+      bootstrapperInitFunction
     );
+  }
+
+  function registerDelegateService() external returns (bool success) {
+    address delegateServiceRegistry = IDelegateServiceFactory(msg.sender).getDelegateServiceRegistry();
+    IDelegateServiceRegistry(delegateServiceRegistry).selfRegisterDelegateService(address(this));
+    success = true;
   }
 
   function getServiceDef() view external returns (ServiceDef memory serviceDef) {
